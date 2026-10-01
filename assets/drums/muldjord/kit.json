@@ -1,0 +1,365 @@
+{
+  "id": "muldjord",
+  "title": "MuldjordKit",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "MuldjordKit, recorded by Lars Muldjord, assembled for FreePats by roberto@zenvoid.org",
+  "source": "https://freepats.zenvoid.org/Percussion/acoustic-drum-kit.html",
+  "sampleRate": 44100,
+  "channels": 1,
+  "bitDepth": 16,
+  "gainApplied": 0.9702,
+  "files": [
+    {
+      "piece": "kick",
+      "layer": "ghost",
+      "file": "kick-ghost.wav",
+      "bytes": 52998,
+      "sha256": "61db17a3f199b6fa66cd4d22200ae6bccb97cd232b8bb51b81ba619c83196dfc",
+      "sourceLayer": 2,
+      "sourceLayers": 25,
+      "sourceRms": 0.02196,
+      "sourceFiles": [
+        "2-KdrumL.wav"
+      ]
+    },
+    {
+      "piece": "kick",
+      "layer": "normal",
+      "file": "kick-normal.wav",
+      "bytes": 52998,
+      "sha256": "250cf4df33d2259888ce30889f8c81af06dea6057f28872ed4e2cedac37b4b4b",
+      "sourceLayer": 11,
+      "sourceLayers": 25,
+      "sourceRms": 0.04104,
+      "sourceFiles": [
+        "11-KdrumL.wav"
+      ]
+    },
+    {
+      "piece": "kick",
+      "layer": "accent",
+      "file": "kick-accent.wav",
+      "bytes": 52998,
+      "sha256": "b5691be8fcd02d244bcb1e294a7823fcab6dc9123295bef47e1aa0d289f38fd3",
+      "sourceLayer": 25,
+      "sourceLayers": 25,
+      "sourceRms": 0.07326,
+      "sourceFiles": [
+        "25-KdrumL.wav"
+      ]
+    },
+    {
+      "piece": "snare",
+      "layer": "ghost",
+      "file": "snare-ghost.wav",
+      "bytes": 61818,
+      "sha256": "3b731959077e2200f35c1d05020a578e9887b29efe1edc00c32ecb22eeea8cd5",
+      "sourceLayer": 5,
+      "sourceLayers": 56,
+      "sourceRms": 0.00848,
+      "sourceFiles": [
+        "5-Snare.wav"
+      ]
+    },
+    {
+      "piece": "snare",
+      "layer": "normal",
+      "file": "snare-normal.wav",
+      "bytes": 61818,
+      "sha256": "6508eb966894c7b7c5a9eb8b3b86fb2bc93174aeb4207965060bf3890e1cb90e",
+      "sourceLayer": 16,
+      "sourceLayers": 56,
+      "sourceRms": 0.02471,
+      "sourceFiles": [
+        "16-Snare.wav"
+      ]
+    },
+    {
+      "piece": "snare",
+      "layer": "accent",
+      "file": "snare-accent.wav",
+      "bytes": 61818,
+      "sha256": "447fc253cab455afccb975279253d26da4bdbf0982e83b565c3ec8f863f54982",
+      "sourceLayer": 56,
+      "sourceLayers": 56,
+      "sourceRms": 0.06868,
+      "sourceFiles": [
+        "56-Snare.wav"
+      ]
+    },
+    {
+      "piece": "hhClosed",
+      "layer": "ghost",
+      "file": "hhClosed-ghost.wav",
+      "bytes": 30948,
+      "sha256": "b402b77e7d02944770dfb01d1764772296f7ba40d362332671dd5c7d054382a5",
+      "sourceLayer": 3,
+      "sourceLayers": 29,
+      "sourceRms": 0.00197,
+      "sourceFiles": [
+        "3-HihatClosed.wav"
+      ]
+    },
+    {
+      "piece": "hhClosed",
+      "layer": "normal",
+      "file": "hhClosed-normal.wav",
+      "bytes": 30948,
+      "sha256": "e2c3d0483636c6d62285a3fad564ed3269ba5708700df6a18c9a51d9a8818fed",
+      "sourceLayer": 16,
+      "sourceLayers": 29,
+      "sourceRms": 0.00765,
+      "sourceFiles": [
+        "16-HihatClosed.wav"
+      ]
+    },
+    {
+      "piece": "hhClosed",
+      "layer": "accent",
+      "file": "hhClosed-accent.wav",
+      "bytes": 30948,
+      "sha256": "ffff4451c48bfcda0832ef5acb12b405dea8f9a6d9b231e60e04aadc8fbbf9f1",
+      "sourceLayer": 28,
+      "sourceLayers": 29,
+      "sourceRms": 0.02847,
+      "sourceFiles": [
+        "28-HihatClosed.wav"
+      ]
+    },
+    {
+      "piece": "hhOpen",
+      "layer": "ghost",
+      "file": "hhOpen-ghost.wav",
+      "bytes": 79458,
+      "sha256": "d157803617c525e1cd89d04157270210656ef9b91f88f1273442df700f034056",
+      "sourceLayer": 4,
+      "sourceLayers": 29,
+      "sourceRms": 0.00696,
+      "sourceFiles": [
+        "5-HihatOpen.wav"
+      ]
+    },
+    {
+      "piece": "hhOpen",
+      "layer": "normal",
+      "file": "hhOpen-normal.wav",
+      "bytes": 79458,
+      "sha256": "651b2712d3f59fd5f3e6a22f9a636258a82349b7dd18254c48ebbfeb9ff3d76d",
+      "sourceLayer": 8,
+      "sourceLayers": 29,
+      "sourceRms": 0.017,
+      "sourceFiles": [
+        "9-HihatOpen.wav"
+      ]
+    },
+    {
+      "piece": "hhOpen",
+      "layer": "accent",
+      "file": "hhOpen-accent.wav",
+      "bytes": 79458,
+      "sha256": "61ea9ddb8d396677625093c0890f1a2521e61b7dbbf2e65cdd67bc49625f4d81",
+      "sourceLayer": 29,
+      "sourceLayers": 29,
+      "sourceRms": 0.04742,
+      "sourceFiles": [
+        "30-HihatOpen.wav"
+      ]
+    },
+    {
+      "piece": "tom",
+      "layer": "ghost",
+      "file": "tom-ghost.wav",
+      "bytes": 79458,
+      "sha256": "4116fa6d148f14545054fccedec40c50875cbd48ac2136ec333c192372e5a89a",
+      "sourceLayer": 2,
+      "sourceLayers": 11,
+      "sourceRms": 0.02773,
+      "sourceFiles": [
+        "2-Tom1.wav"
+      ]
+    },
+    {
+      "piece": "tom",
+      "layer": "normal",
+      "file": "tom-normal.wav",
+      "bytes": 79458,
+      "sha256": "98af85f19ef3685f30a7cb363101f31d51c591024ebc3acad89320f3e8af29ec",
+      "sourceLayer": 4,
+      "sourceLayers": 11,
+      "sourceRms": 0.04039,
+      "sourceFiles": [
+        "4-Tom1.wav"
+      ]
+    },
+    {
+      "piece": "tom",
+      "layer": "accent",
+      "file": "tom-accent.wav",
+      "bytes": 79458,
+      "sha256": "5498887fa5e2b3020e95272d640a3468c98b38a62e3772cbdc7c741b990cb5a6",
+      "sourceLayer": 11,
+      "sourceLayers": 11,
+      "sourceRms": 0.06642,
+      "sourceFiles": [
+        "11-Tom1.wav"
+      ]
+    },
+    {
+      "piece": "mid",
+      "layer": "ghost",
+      "file": "mid-ghost.wav",
+      "bytes": 88278,
+      "sha256": "f14ffee3e8ce8997a3b7d41350f36e9d31b73ff90f4c5a90ff32f9d1ecddf342",
+      "sourceLayer": 2,
+      "sourceLayers": 15,
+      "sourceRms": 0.02751,
+      "sourceFiles": [
+        "2-Tom3.wav"
+      ]
+    },
+    {
+      "piece": "mid",
+      "layer": "normal",
+      "file": "mid-normal.wav",
+      "bytes": 88278,
+      "sha256": "21a9bc6afa1fcc37ea52f109e4b6b7ccfb7978004140f8a72ede5ee742286afb",
+      "sourceLayer": 4,
+      "sourceLayers": 15,
+      "sourceRms": 0.04367,
+      "sourceFiles": [
+        "4-Tom3.wav"
+      ]
+    },
+    {
+      "piece": "mid",
+      "layer": "accent",
+      "file": "mid-accent.wav",
+      "bytes": 88278,
+      "sha256": "103e10cf1fdacc6c4566831cd0f048f984e0a74eb4af27ab0de1cfe772b2d93c",
+      "sourceLayer": 15,
+      "sourceLayers": 15,
+      "sourceRms": 0.06629,
+      "sourceFiles": [
+        "15-Tom3.wav"
+      ]
+    },
+    {
+      "piece": "floor",
+      "layer": "ghost",
+      "file": "floor-ghost.wav",
+      "bytes": 97098,
+      "sha256": "a8e08494b03999869ba953e981adef91922603ec6f1588574c010ccc8440ae42",
+      "sourceLayer": 3,
+      "sourceLayers": 20,
+      "sourceRms": 0.02523,
+      "sourceFiles": [
+        "3-Tom4.wav"
+      ]
+    },
+    {
+      "piece": "floor",
+      "layer": "normal",
+      "file": "floor-normal.wav",
+      "bytes": 97098,
+      "sha256": "6a4e3f47a59bdda9b6e5244f7441895a304a91b4acc5aed2d6302eb773b04e8f",
+      "sourceLayer": 9,
+      "sourceLayers": 20,
+      "sourceRms": 0.04079,
+      "sourceFiles": [
+        "9-Tom4.wav"
+      ]
+    },
+    {
+      "piece": "floor",
+      "layer": "accent",
+      "file": "floor-accent.wav",
+      "bytes": 97098,
+      "sha256": "8651f55ea97b1f507bf0b032d58133d5dc8a9f92765c4d71c61e79cc5a5d9866",
+      "sourceLayer": 20,
+      "sourceLayers": 20,
+      "sourceRms": 0.06476,
+      "sourceFiles": [
+        "20-Tom4.wav"
+      ]
+    },
+    {
+      "piece": "crash",
+      "layer": "ghost",
+      "file": "crash-ghost.wav",
+      "bytes": 176478,
+      "sha256": "3ed26d3d722f706227b795fab96b8405c6803bdbb3ec8e4522a186932cd0a34d",
+      "sourceLayer": 2,
+      "sourceLayers": 9,
+      "sourceRms": 0.01082,
+      "sourceFiles": [
+        "2-CrashL.wav"
+      ]
+    },
+    {
+      "piece": "crash",
+      "layer": "normal",
+      "file": "crash-normal.wav",
+      "bytes": 176478,
+      "sha256": "747f8c9cd702cb61602d5e42b992965b3be79f4433447c1d3ad30edf69cf2968",
+      "sourceLayer": 5,
+      "sourceLayers": 9,
+      "sourceRms": 0.0194,
+      "sourceFiles": [
+        "5-CrashL.wav"
+      ]
+    },
+    {
+      "piece": "crash",
+      "layer": "accent",
+      "file": "crash-accent.wav",
+      "bytes": 176478,
+      "sha256": "67430dd6857a4db727ec5be267295c96c88adf7cf7da78f18350d54e22297d51",
+      "sourceLayer": 9,
+      "sourceLayers": 9,
+      "sourceRms": 0.04275,
+      "sourceFiles": [
+        "9-CrashL.wav"
+      ]
+    },
+    {
+      "piece": "ride",
+      "layer": "ghost",
+      "file": "ride-ghost.wav",
+      "bytes": 141198,
+      "sha256": "4be87d447cb84945ee66809d7841465ea914e89fffdb3a8560dc5a127a48b02d",
+      "sourceLayer": 2,
+      "sourceLayers": 10,
+      "sourceRms": 0.01239,
+      "sourceFiles": [
+        "2-RideL.wav"
+      ]
+    },
+    {
+      "piece": "ride",
+      "layer": "normal",
+      "file": "ride-normal.wav",
+      "bytes": 141198,
+      "sha256": "1b6270fc151ba752dfbaace4ba711738b72b41e8d328340e911865e6b6d86092",
+      "sourceLayer": 4,
+      "sourceLayers": 10,
+      "sourceRms": 0.01998,
+      "sourceFiles": [
+        "4-RideL.wav"
+      ]
+    },
+    {
+      "piece": "ride",
+      "layer": "accent",
+      "file": "ride-accent.wav",
+      "bytes": 141198,
+      "sha256": "800ab2dbc801f53b77ffc966529a4538af700f32640110a810a86ea1d80076d5",
+      "sourceLayer": 10,
+      "sourceLayers": 10,
+      "sourceRms": 0.03269,
+      "sourceFiles": [
+        "10-RideL.wav"
+      ]
+    }
+  ]
+}

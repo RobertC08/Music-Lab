@@ -1,0 +1,194 @@
+{
+  "id": "drsx",
+  "title": "DRSKit (extra pieces)",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "DRSKit by the DrumGizmo team (Lars Muldjord, Bent Bisballe Nyeng) and Jes Eiler of DRSDrums; SFZ port by kinwie",
+  "source": "https://github.com/sfzinstruments/DrumGizmo.DRSKit",
+  "sampleRate": 44100,
+  "channels": 1,
+  "bitDepth": 16,
+  "gainApplied": 2.2185,
+  "files": [
+    {
+      "piece": "crossStick",
+      "layer": "ghost",
+      "file": "crossStick-ghost.wav",
+      "bytes": 12184,
+      "sha256": "cec5f416977baf7df5804cb2257e430b37ea972a4891d8771496eaadff804104",
+      "sourceLayer": 2,
+      "sourceLayers": 10,
+      "sourceRms": 0.00291,
+      "sourceFiles": [
+        "2-Snare_rim-Snare_top.flac",
+        "2-Snare_rim-OHL.flac",
+        "2-Snare_rim-OHR.flac"
+      ]
+    },
+    {
+      "piece": "crossStick",
+      "layer": "normal",
+      "file": "crossStick-normal.wav",
+      "bytes": 17012,
+      "sha256": "1b8b38f0576c41b3963744638a56ad5e63decb9263d074807cc86379d2eb9a9c",
+      "sourceLayer": 5,
+      "sourceLayers": 10,
+      "sourceRms": 0.00519,
+      "sourceFiles": [
+        "5-Snare_rim-Snare_top.flac",
+        "5-Snare_rim-OHL.flac",
+        "5-Snare_rim-OHR.flac"
+      ]
+    },
+    {
+      "piece": "crossStick",
+      "layer": "accent",
+      "file": "crossStick-accent.wav",
+      "bytes": 20710,
+      "sha256": "e056a557592adeca82b0885f093c8c9b42039906c466fcc11e449ca6e3f5b4ed",
+      "sourceLayer": 10,
+      "sourceLayers": 10,
+      "sourceRms": 0.01052,
+      "sourceFiles": [
+        "10-Snare_rim-Snare_top.flac",
+        "10-Snare_rim-OHL.flac",
+        "10-Snare_rim-OHR.flac"
+      ]
+    },
+    {
+      "piece": "hhFoot",
+      "layer": "ghost",
+      "file": "hhFoot-ghost.wav",
+      "bytes": 20548,
+      "sha256": "e109b6722c3056a8cd4c7def6db3a0f1f509d9ab63077b140990e1cba7d50041",
+      "sourceLayer": 4,
+      "sourceLayers": 8,
+      "sourceRms": 0.00363,
+      "sourceFiles": [
+        "4-Hihat_foot-Hihat.flac",
+        "4-Hihat_foot-OHL.flac",
+        "4-Hihat_foot-OHR.flac"
+      ]
+    },
+    {
+      "piece": "hhFoot",
+      "layer": "normal",
+      "file": "hhFoot-normal.wav",
+      "bytes": 19300,
+      "sha256": "e774ffa259bf4a7619578418b245c97630474a3cccb86c099ee45678e32efd5c",
+      "sourceLayer": 7,
+      "sourceLayers": 8,
+      "sourceRms": 0.00562,
+      "sourceFiles": [
+        "7-Hihat_foot-Hihat.flac",
+        "7-Hihat_foot-OHL.flac",
+        "7-Hihat_foot-OHR.flac"
+      ]
+    },
+    {
+      "piece": "hhFoot",
+      "layer": "accent",
+      "file": "hhFoot-accent.wav",
+      "bytes": 16928,
+      "sha256": "8ba2b024f36ed8e2e62cf59cf04ba193f0324bbbf566bbe3eb734c91338fa15d",
+      "sourceLayer": 6,
+      "sourceLayers": 8,
+      "sourceRms": 0.00979,
+      "sourceFiles": [
+        "6-Hihat_foot-Hihat.flac",
+        "6-Hihat_foot-OHL.flac",
+        "6-Hihat_foot-OHR.flac"
+      ]
+    },
+    {
+      "piece": "rideBell",
+      "layer": "ghost",
+      "file": "rideBell-ghost.wav",
+      "bytes": 137520,
+      "sha256": "b5a8a6536f5b9cb69a4362ad7dca44e766adcdc0aa3115617d4a3d92c27f8798",
+      "sourceLayer": 2,
+      "sourceLayers": 10,
+      "sourceRms": 0.00172,
+      "sourceFiles": [
+        "2-Ride_tip_bell-Ride.flac",
+        "2-Ride_tip_bell-OHL.flac",
+        "2-Ride_tip_bell-OHR.flac"
+      ]
+    },
+    {
+      "piece": "rideBell",
+      "layer": "normal",
+      "file": "rideBell-normal.wav",
+      "bytes": 141198,
+      "sha256": "569b10f8031562123cba21d3de173f21748203211708387ca3aaaaddc81b9244",
+      "sourceLayer": 4,
+      "sourceLayers": 10,
+      "sourceRms": 0.0044,
+      "sourceFiles": [
+        "4-Ride_tip_bell-Ride.flac",
+        "4-Ride_tip_bell-OHL.flac",
+        "4-Ride_tip_bell-OHR.flac"
+      ]
+    },
+    {
+      "piece": "rideBell",
+      "layer": "accent",
+      "file": "rideBell-accent.wav",
+      "bytes": 141198,
+      "sha256": "511a1e615b8b0c0d6dd399c38d15b46f9c6d496b987873b7b419f76fdd5ec948",
+      "sourceLayer": 10,
+      "sourceLayers": 10,
+      "sourceRms": 0.01229,
+      "sourceFiles": [
+        "10-Ride_tip_bell-Ride.flac",
+        "10-Ride_tip_bell-OHL.flac",
+        "10-Ride_tip_bell-OHR.flac"
+      ]
+    },
+    {
+      "piece": "brush",
+      "layer": "ghost",
+      "file": "brush-ghost.wav",
+      "bytes": 12738,
+      "sha256": "3d404f54b1d7750758ae5d39976802f9e2692aedcc38a8b3a3b0d95688ac1a3c",
+      "sourceLayer": 2,
+      "sourceLayers": 15,
+      "sourceRms": 0.00234,
+      "sourceFiles": [
+        "2-Snare_whisker-Snare_top.flac",
+        "2-Snare_whisker-OHL.flac",
+        "2-Snare_whisker-OHR.flac"
+      ]
+    },
+    {
+      "piece": "brush",
+      "layer": "normal",
+      "file": "brush-normal.wav",
+      "bytes": 15960,
+      "sha256": "94e8f3a2f884075674ec021359eae7ef0f814fb4ba964558b325009ccc9553dc",
+      "sourceLayer": 8,
+      "sourceLayers": 15,
+      "sourceRms": 0.0056,
+      "sourceFiles": [
+        "8-Snare_whisker-Snare_top.flac",
+        "8-Snare_whisker-OHL.flac",
+        "8-Snare_whisker-OHR.flac"
+      ]
+    },
+    {
+      "piece": "brush",
+      "layer": "accent",
+      "file": "brush-accent.wav",
+      "bytes": 23566,
+      "sha256": "b2f85a8ac362cf845385b010e97596e2d0c186e86975958ce0f7108e8cd3f116",
+      "sourceLayer": 15,
+      "sourceLayers": 15,
+      "sourceRms": 0.01515,
+      "sourceFiles": [
+        "15-Snare_whisker-Snare_top.flac",
+        "15-Snare_whisker-OHL.flac",
+        "15-Snare_whisker-OHR.flac"
+      ]
+    }
+  ]
+}

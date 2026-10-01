@@ -1,6 +1,16 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@/lib/rhythm/*": ["./src/*"],
+      "@/lib/drums/*": ["./src/drums/*"],
+      "@/components/drums/*": ["./src/components/drums/*"],
+      "@/components/public-practice/*": ["./src/components/public-practice/*"],
+      "@/components/system/*": ["./src/components/system/*"],
+      "@/components/rhythm/*": ["./src/components/*"],
+      "@/lib/guest/*": ["./guest/*"],
+      "@/lib/haptics/*": ["./haptics/*"]
+    }
   }
 }
