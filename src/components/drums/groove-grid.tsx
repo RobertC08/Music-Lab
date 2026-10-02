@@ -1,8 +1,12 @@
+import { memo } from 'react'
 import { Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { publicColors } from '@/components/public-practice/ui'
 import { kitPieces, type DrumExercise, type Hit, type KitPiece } from '@/lib/drums/exercise'
+import { beatDivisions, MIXED_STEPS_PER_BEAT } from '@/lib/drums/mixed-grid'
 import { displayBarsOf } from '@/lib/drums/notation-bars'
+import type { StepCursor } from '@/lib/drums/playhead'
+import { useCellActive } from '@/lib/drums/use-playhead'
 
 /*
   Groove-ul scris ca grilă: un rând pe piesă, un pătrat pe pas.
@@ -26,14 +30,17 @@ import { displayBarsOf } from '@/lib/drums/notation-bars'
   cross-stick-ul și mătura lângă toba mică, iar fusul cu piciorul sub toba
   mare, unde îl scrie și portativul.
 */
-const ROW_ORDER: KitPiece[] = [
+export const ROW_ORDER: KitPiece[] = [
   'crash',
+  'cowbell',
   'rideBell',
   'ride',
   'hhOpen',
   'hhClosed',
   'crossStick',
+  'rimClick',
   'brush',
+  'rimshot',
   'snare',
   'tom',
   'mid',
@@ -43,7 +50,7 @@ const ROW_ORDER: KitPiece[] = [
 ]
 
 /** Culoarea fiecărei piese. Cinelele reci, tobele calde, toba mare închisă. */
-const pieceColors: Record<KitPiece, string> = {
+export const pieceColors: Record<KitPiece, string> = {
   crash: '#7A5AF8',
   ride: '#6547E8',
   hhOpen: '#0E9F9A',
@@ -58,6 +65,9 @@ const pieceColors: Record<KitPiece, string> = {
   crossStick: '#8F2F1E',
   brush: '#E07A5F',
   hhFoot: '#05605C',
+  cowbell: '#9A7B12',
+  rimshot: '#A3200B',
+  rimClick: '#6E3B2E',
 }
 
 /*
@@ -68,7 +78,7 @@ const pieceColors: Record<KitPiece, string> = {
   arătau identic. Scurtate, se citesc dintr-o privire, iar ordinea rândurilor
   (cinelele sus, toba mare jos) spune restul.
 */
-const LABEL_WIDTH = 44
+export const LABEL_WIDTH = 44
 
 /*
   Două densități, alese după cât are de desenat exercițiul.
@@ -90,13 +100,21 @@ export interface GrooveGridProps {
   activeStep?: number
   /** Explicația de sub grilă. Se ascunde în timpul sesiunii: nu mai e de citit. */
   showHint?: boolean
+  /**
+   * Cursorul redării (`playhead.ts`). Dacă e dat, fiecare celulă se abonează la
+   * el și se redesenează singură când se aprinde sau se stinge, iar
+   * `activeBar`/`activeStep` nu mai contează. E varianta pentru redare: grila
+   * întreagă nu se mai reface la fiecare pas.
+   */
+  cursor?: StepCursor
 }
 
-export function GrooveGrid({
+function GrooveGridView({
   exercise,
   activeBar = -1,
   activeStep = -1,
   showHint = true,
+  cursor,
 }: GrooveGridProps) {
   const { t } = useTranslation()
   const stepsPerBeat = exercise.stepsPerBar / exercise.beatsPerBar
@@ -110,6 +128,24 @@ export function GrooveGrid({
     (piece) => !ROW_ORDER.includes(piece) && exercise.bars.some((bar) => bar.lanes[piece]),
   )
   const rows = [...used, ...unknown]
+  /*
+    Grila amestecată (`mixed-grid.ts`): 12 pași pe timp, dar fiecare timp se
+    desenează cu subdiviziunea pe care o folosește cu adevărat. Celula ține
+    `span` pași, deci se aprinde cât durează nota ei, nu doar pe primul pas.
+  */
+  const mixed = stepsPerBeat === MIXED_STEPS_PER_BEAT
+  const beatsOf = (bar: (typeof displayBars)[number]['bar']) => {
+    const divisions = mixed
+      ? beatDivisions(bar, exercise.stepsPerBar, exercise.beatsPerBar)
+      : Array<number>(exercise.beatsPerBar).fill(stepsPerBeat)
+    return divisions.map((division, beat) => {
+      const span = stepsPerBeat / division
+      return Array.from({ length: division }, (_, index) => ({
+        step: beat * stepsPerBeat + index * span,
+        span,
+      }))
+    })
+  }
   const dense = rows.length * displayBars.length >= TIGHT_FROM
   const size = dense ? TIGHT : LOOSE
 
@@ -120,6 +156,9 @@ export function GrooveGrid({
         // Numerele timpilor se scriu o dată, sub ultima măsură, când e înghesuit:
         // grila e aceeași la toate măsurile, deci repetate n-ar spune nimic nou.
         const withNumbers = !dense || index === displayBars.length - 1
+        const beats = beatsOf(bar)
+        const isActive = (step: number, span: number) =>
+          active && activeStep >= step && activeStep < step + span
         return (
           <View
             key={index}
@@ -160,6 +199,54 @@ export function GrooveGrid({
               </View>
             ) : null}
 
+            {/*
+              Pe grila amestecată, deasupra măsurii, o paranteză cu cifra peste
+              fiecare timp de triolet (3) sau sextolet (6), ca pe portativ. Sus,
+              nu jos: lângă numerele timpilor, „6 3” se citea ca o numărătoare.
+            */}
+            {mixed && beats.some((cells) => cells.length === 3 || cells.length === 6) ? (
+              <View style={{ flexDirection: 'row', gap: 5 }}>
+                <View style={{ width: LABEL_WIDTH }} />
+                <View style={{ flex: 1, flexDirection: 'row', gap: 2 }}>
+                  {beats.map((cells, beat) => {
+                    const tuplet = cells.length === 3 || cells.length === 6
+                    return (
+                      <View key={beat} style={{ flex: 1, height: 12, justifyContent: 'flex-end' }}>
+                        {tuplet ? (
+                          <View
+                            style={{
+                              height: 6,
+                              marginHorizontal: 2,
+                              borderTopWidth: 1.2,
+                              borderLeftWidth: 1.2,
+                              borderRightWidth: 1.2,
+                              borderColor: publicColors.muted,
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Text
+                              style={{
+                                position: 'absolute',
+                                top: -7,
+                                paddingHorizontal: 3,
+                                fontSize: 9,
+                                lineHeight: 11,
+                                fontWeight: '900',
+                                color: publicColors.ink,
+                                backgroundColor: publicColors.card,
+                              }}
+                            >
+                              {cells.length}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    )
+                  })}
+                </View>
+              </View>
+            ) : null}
+
             {rows.map((piece) => {
               const slots = bar.lanes[piece] ?? []
               return (
@@ -178,15 +265,33 @@ export function GrooveGrid({
                     {t(`drums.pieceShort_${piece}`)}
                   </Text>
                   <View style={{ flex: 1, flexDirection: 'row', gap: 2 }}>
-                    {Array.from({ length: exercise.stepsPerBar }, (_, step) => (
-                      <Cell
-                        key={step}
-                        hit={slots[step] ?? null}
-                        color={pieceColors[piece]}
-                        onBeat={step % stepsPerBeat === 0}
-                        active={active && step === activeStep}
-                        height={size.cell}
-                      />
+                    {beats.map((cells, beat) => (
+                      <View key={beat} style={{ flex: 1, flexDirection: 'row', gap: 2 }}>
+                        {cells.map(({ step, span }) =>
+                          cursor ? (
+                            <LiveCell
+                              key={step}
+                              cursor={cursor}
+                              bars={sourceBars}
+                              step={step}
+                              span={span}
+                              hit={slots[step] ?? null}
+                              color={pieceColors[piece]}
+                              onBeat={step % stepsPerBeat === 0}
+                              height={size.cell}
+                            />
+                          ) : (
+                            <Cell
+                              key={step}
+                              hit={slots[step] ?? null}
+                              color={pieceColors[piece]}
+                              onBeat={step % stepsPerBeat === 0}
+                              active={isActive(step, span)}
+                              height={size.cell}
+                            />
+                          ),
+                        )}
+                      </View>
                     ))}
                   </View>
                 </View>
@@ -196,12 +301,16 @@ export function GrooveGrid({
             <View style={{ flexDirection: 'row', gap: 5, display: withNumbers ? 'flex' : 'none' }}>
               <View style={{ width: LABEL_WIDTH }} />
               <View style={{ flex: 1, flexDirection: 'row', gap: 2 }}>
-                {Array.from({ length: exercise.stepsPerBar }, (_, step) => (
-                  <View key={step} style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 8, lineHeight: 10, color: publicColors.muted }}>
-                      {/* Numerele timpilor, restul gol: altfel numărătoarea dispare între cifre. */}
-                      {step % stepsPerBeat === 0 ? String(step / stepsPerBeat + 1) : ''}
-                    </Text>
+                {beats.map((cells, beat) => (
+                  <View key={beat} style={{ flex: 1, flexDirection: 'row', gap: 2 }}>
+                    {cells.map(({ step }) => (
+                      <View key={step} style={{ flex: 1, alignItems: 'center' }}>
+                        <Text style={{ fontSize: 8, lineHeight: 10, color: publicColors.muted }}>
+                          {/* Numerele timpilor, restul gol: altfel numărătoarea dispare între cifre. */}
+                          {step % stepsPerBeat === 0 ? String(step / stepsPerBeat + 1) : ''}
+                        </Text>
+                      </View>
+                    ))}
                   </View>
                 ))}
               </View>
@@ -223,7 +332,30 @@ export function GrooveGrid({
   )
 }
 
-function Cell({
+/** O celulă care își află singură dacă e aprinsă, din cursor. */
+function LiveCell({
+  cursor,
+  bars,
+  step,
+  span,
+  ...rest
+}: {
+  cursor: StepCursor
+  bars: readonly number[]
+  step: number
+  span: number
+  hit: Hit | null
+  color: string
+  onBeat: boolean
+  height: number
+}) {
+  const active = useCellActive(cursor, bars, step, span)
+  return <Cell {...rest} active={active} />
+}
+
+const Cell = memo(CellView)
+
+function CellView({
   hit,
   color,
   onBeat,
@@ -283,3 +415,11 @@ function Cell({
     </View>
   )
 }
+
+/*
+  Memoizat: în timpul redării, ecranul care îl conține se redesenează la fiecare
+  cadru (poziția din pistă), dar acesta se schimbă doar când trece un pas. Fără
+  memo, toate celulele se refăceau de ~60 de ori pe secundă, iar în modul de
+  dezvoltare asta se simțea ca lag pe telefon.
+*/
+export const GrooveGrid = memo(GrooveGridView)

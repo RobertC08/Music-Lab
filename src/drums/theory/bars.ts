@@ -1,5 +1,6 @@
 import { kitPieces, type Bar, type DrumExercise, type Hit, type KitPiece, type Vocabulary } from '../exercise'
 import { snareBar } from '../snare-bar'
+import type { DrumPlan } from '../plan'
 
 /*
   Măsurile exemplelor din manual, scrise ca rânduri de caractere.
@@ -27,7 +28,8 @@ import { snareBar } from '../snare-bar'
 export const theoryVocabulary: Vocabulary = {
   pieces: kitPieces,
   hits: ['ghost', 'normal', 'accent'],
-  stepsPerBeat: [1, 2, 3, 4],
+  // 12: grila comună a subdiviziunilor amestecate (`mixed-grid.ts`), pentru fill-urile avansate.
+  stepsPerBeat: [1, 2, 3, 4, 12],
 }
 
 /**
@@ -99,5 +101,24 @@ export function snareDemo(options: {
     beatsPerBar: options.beatsPerBar ?? 4,
     bars: options.bars.map(({ sticking, ...marks }) => snareBar(sticking, marks)),
     tempo: options.tempo,
+  }
+}
+
+/**
+ * Clicul rărit: din toate pătrimile planificate rămân doar timpii ceruți pe
+ * fiecare măsură a exercițiului (de la 1), reluați ciclic.
+ *
+ * Se lucrează pe plan, nu în randare: cheia de cache se face din clicurile
+ * planului, deci un clic rărit e altă pistă fără nimic în plus.
+ */
+export function thinClicks(plan: DrumPlan, beatsByBar: readonly (readonly number[])[]): DrumPlan {
+  if (beatsByBar.length === 0) return plan
+  return {
+    ...plan,
+    clicks: plan.clicks.filter((click) => {
+      const bar = plan.bars[click.bar]
+      if (!bar || bar.exerciseBar < 0) return true
+      return beatsByBar[bar.exerciseBar % beatsByBar.length]!.includes(click.beat + 1)
+    }),
   }
 }

@@ -80,13 +80,15 @@ describe('catalogul de groove-uri', () => {
     /*
       Excepția e jazz-ul: acolo ride-ul și hi-hat-ul la picior SUNT groove-ul, iar
       toba mică vine din frazare, nu din model. Orice alt groove fără backbeat ar
-      fi o greșeală de scriere, nu un stil. Cross-stick-ul ține locul tobei mici:
-      e tot toba mică, lovită pe ramă (bossa).
+      fi o greșeală de scriere, nu un stil. Cross-stick-ul și lovitura pe ramă țin
+      locul tobei mici: e tot toba mică, lovită altfel (bossa, cha-cha-chá).
     */
     for (const exercise of grooves) {
       if (exercise.id === 'jazz-ride') continue
       const pieces = new Set(onsetsOf(exercise).map((onset) => onset.piece))
-      expect(pieces.has('snare') || pieces.has('crossStick'), exercise.id).toBe(true)
+      // Toate sunt toba mică, lovită altfel: cross-stick, ramă, rimshot.
+      const snareStrokes = ['snare', 'crossStick', 'rimClick', 'rimshot'] as const
+      expect(snareStrokes.some((piece) => pieces.has(piece)), exercise.id).toBe(true)
       expect(pieces.has('kick'), exercise.id).toBe(true)
     }
   })
@@ -94,7 +96,19 @@ describe('catalogul de groove-uri', () => {
   it('pune backbeat-ul pe 2 și 4 acolo unde stilul îl cere', () => {
     // Fără verificarea asta, un rând mutat cu un pas ar da un groove care sună
     // „aproape bine” și pe care nimeni nu l-ar prinde citind tabelul.
-    for (const id of ['rock-backbeat', 'rock-sixteenth-hats', 'metal-driving']) {
+    for (const id of [
+      'rock-basic',
+      'rock-backbeat',
+      'rock-sixteenth-hats',
+      'rock-sixteenth-kicks',
+      'offbeat-hat',
+      'disco-open-hat',
+      'disco-sixteenths',
+      'disco-syncopated',
+      'metal-driving',
+      'metal-gallop',
+      'metal-double-bass',
+    ]) {
       const exercise = grooveById(id)!
       const perBeat = exercise.stepsPerBar / exercise.beatsPerBar
       const snareBeats = onsetsOf(exercise)
@@ -106,17 +120,60 @@ describe('catalogul de groove-uri', () => {
 
   it('folosește ghost note-uri acolo unde ele sunt groove-ul', () => {
     // Bossa nu mai e aici: clave-ul ei se cântă pe cross-stick, nu ca ghost notes.
-    for (const id of ['funk-ghost', 'funk-syncopated']) {
+    for (const id of ['funk-ghost', 'funk-syncopated', 'funk-open-hat', 'shuffle-ghost']) {
       const ghosts = onsetsOf(grooveById(id)!).filter((onset) => onset.hit === 'ghost')
       expect(ghosts.length, id).toBeGreaterThan(1)
     }
   })
 
-  it('lasă mijlocul trioletei gol la shuffle', () => {
+  it('lasă mijlocul trioletei gol la shuffle, pe toate nivelurile', () => {
     // Asta e chiar definiția lui: „ta-ta", nu „ta-ta-ta".
-    const shuffle = grooveById('shuffle-basic')!
-    const middles = onsetsOf(shuffle).filter((onset) => onset.step % 3 === 1)
-    expect(middles).toHaveLength(0)
+    const shuffles = grooves.filter((exercise) => exercise.style === 'shuffle')
+    expect(shuffles.length).toBeGreaterThan(1)
+    for (const shuffle of shuffles) {
+      const middles = onsetsOf(shuffle).filter((onset) => onset.step % 3 === 1)
+      expect(middles, shuffle.id).toHaveLength(0)
+    }
+  })
+
+  it('pune hi-hat-ul de off-beat între timpi, niciodată odată cu toba mare', () => {
+    // Asta e tot nivelul: mâna și piciorul alternează. Un rând mutat cu un pas
+    // le-ar pune deodată și ar face din off-beat un rock cu hi-hat pe pătrimi.
+    const offbeat = grooveById('offbeat-hat')!
+    const onsets = onsetsOf(offbeat)
+    const hats = onsets.filter((onset) => onset.piece === 'hhClosed').map((onset) => onset.step)
+    const kicks = onsets.filter((onset) => onset.piece === 'kick').map((onset) => onset.step)
+    expect(hats).toEqual([1, 3, 5, 7])
+    expect(kicks).toEqual([0, 2, 4, 6])
+  })
+
+  it('deschide hi-hat-ul de disco pe fiecare „și” și îl închide pe timp', () => {
+    for (const id of ['disco-open-hat', 'disco-sixteenths', 'disco-syncopated']) {
+      const exercise = grooveById(id)!
+      const perBeat = exercise.stepsPerBar / exercise.beatsPerBar
+      const open = onsetsOf(exercise)
+        .filter((onset) => onset.piece === 'hhOpen')
+        .map((onset) => onset.step / perBeat)
+      expect(open, id).toEqual([0.5, 1.5, 2.5, 3.5])
+      const closedOnBeats = onsetsOf(exercise).filter(
+        (onset) => onset.piece === 'hhClosed' && onset.step % perBeat === 0,
+      )
+      expect(closedOnBeats, id).toHaveLength(4)
+    }
+  })
+
+  it('ține stilurile la un loc în listă, fiecare cu mai multe niveluri', () => {
+    // Lista se desenează pe grupuri: un stil rupt în două ar apărea de două ori.
+    const seen: string[] = []
+    for (const exercise of grooves) {
+      if (seen.at(-1) !== exercise.style) {
+        expect(seen, exercise.style).not.toContain(exercise.style)
+        seen.push(exercise.style!)
+      }
+    }
+    for (const style of ['rock', 'disco', 'metal', 'funk', 'shuffle', 'jazz']) {
+      expect(grooves.filter((exercise) => exercise.style === style).length, style).toBeGreaterThan(1)
+    }
   })
 })
 

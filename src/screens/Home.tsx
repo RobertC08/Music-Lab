@@ -17,6 +17,7 @@ export function Home({
   onOpenDrums,
   onOpenGrooves,
   onOpenFills,
+  onOpenAdvancedFills,
 }: {
   onOpenCategory: (category: Category) => void
   /** Tobe: insotitor de practica. Fara scor, deci nu e o categorie de jocuri. */
@@ -24,6 +25,7 @@ export function Home({
   onOpenDrums?: () => void
   onOpenGrooves?: () => void
   onOpenFills?: () => void
+  onOpenAdvancedFills?: () => void
   /**
    * Bancul de timing e unealta de diagnostic, nu functionalitate: nu se
    * livreaza la integrare. Fara el link-ul nu se deseneaza deloc, ca sa nu
@@ -240,6 +242,28 @@ export function Home({
           </Text>
           <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
             Trei masuri de groove, a patra e a ta.
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenAdvancedFills ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenAdvancedFills}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            Tobe · Fill-uri avansate
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            Saisprezecimi, triolete si sextolete in aceeasi masura.
           </Text>
         </Pressable>
       ) : null}

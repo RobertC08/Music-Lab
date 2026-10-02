@@ -2,10 +2,20 @@ import { useEffect } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ChevronRight } from 'lucide-react-native'
+import { ArrowLeft, Check, ChevronRight, ListChecks } from 'lucide-react-native'
 import { publicColors } from '@/components/public-practice/ui'
 import { loadKit } from '@/lib/drums/kit'
-import type { DrumTheory, DrumTheoryLesson } from '@/lib/drums/theory'
+import {
+  passed,
+  quizForLesson,
+  reviewForStage,
+  type DrumQuiz,
+  type DrumTheory,
+  type DrumTheoryLesson,
+} from '@/lib/drums/theory'
+
+/** Cel mai bun scor la fiecare quiz, după id. */
+export type QuizScores = Record<string, { score: number; total: number }>
 
 /*
   Intrarea în manual, deocamdată o listă, nu harta.
@@ -23,11 +33,15 @@ import type { DrumTheory, DrumTheoryLesson } from '@/lib/drums/theory'
 */
 export function TheoryIndexScreen({
   theory,
+  scores = {},
   onOpenLesson,
+  onOpenQuiz,
   onExit,
 }: {
   theory: DrumTheory
+  scores?: QuizScores
   onOpenLesson: (lesson: DrumTheoryLesson) => void
+  onOpenQuiz?: (quiz: DrumQuiz) => void
   onExit: () => void
 }) {
   const { t } = useTranslation()
@@ -89,6 +103,8 @@ export function TheoryIndexScreen({
 
         {theory.stages.map((stage) => {
           const lessons = theory.lessons.filter((lesson) => lesson.stage === stage.id)
+          const review = reviewForStage(theory, stage.id)
+          const reviewScore = review ? scores[review.id] : undefined
           return (
             <View key={stage.id} style={{ gap: 8 }}>
               <Text
@@ -141,15 +157,82 @@ export function TheoryIndexScreen({
                       <Text style={{ fontSize: 13, lineHeight: 19, color: publicColors.muted }}>
                         {lesson.goal}
                       </Text>
+                      <QuizBadge
+                        quiz={quizForLesson(theory, lesson.id)}
+                        scores={scores}
+                        accent={stage.accent}
+                      />
                     </View>
                     <ChevronRight size={20} color={publicColors.muted} />
                   </Pressable>
                 ))
               )}
+              {/*
+                Recapitularea, după ultima lecție a etapei: vine la capătul
+                drumului, nu înainte, fiindcă întreabă din toate lecțiile.
+              */}
+              {review && onOpenQuiz ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => onOpenQuiz(review)}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 12,
+                    borderRadius: 18,
+                    borderWidth: 2,
+                    borderStyle: 'dashed',
+                    borderColor: stage.accent,
+                    backgroundColor: pressed ? stage.soft : publicColors.card,
+                    padding: 16,
+                  })}
+                >
+                  <ListChecks size={22} color={stage.accent} />
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: publicColors.ink }}>
+                      {t('drums.quizReviewCta')}
+                    </Text>
+                    <Text style={{ fontSize: 13, lineHeight: 19, color: publicColors.muted }}>
+                      {reviewScore
+                        ? t('drums.quizBest', reviewScore)
+                        : t('drums.quizReviewHint', { count: review.questions.length })}
+                    </Text>
+                  </View>
+                  {reviewScore && passed(reviewScore.score, reviewScore.total) ? (
+                    <Check size={20} color="#1E8E5A" />
+                  ) : (
+                    <ChevronRight size={20} color={publicColors.muted} />
+                  )}
+                </Pressable>
+              ) : null}
             </View>
           )
         })}
       </ScrollView>
     </SafeAreaView>
+  )
+}
+
+/** Starea quiz-ului de sub o lecție: cel mai bun scor, sau nimic până îl faci. */
+function QuizBadge({
+  quiz,
+  scores,
+  accent,
+}: {
+  quiz: DrumQuiz | null
+  scores: QuizScores
+  accent: string
+}) {
+  const { t } = useTranslation()
+  const best = quiz ? scores[quiz.id] : undefined
+  if (!best) return null
+  const ok = passed(best.score, best.total)
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+      {ok ? <Check size={14} color="#1E8E5A" /> : null}
+      <Text style={{ fontSize: 12, fontWeight: '800', color: ok ? '#1E8E5A' : accent }}>
+        {t('drums.quizBest', best)}
+      </Text>
+    </View>
   )
 }

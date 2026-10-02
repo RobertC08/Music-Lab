@@ -52,13 +52,39 @@ export const STAFF_POSITION: Record<KitPiece, number> = {
   brush: 5,
   rideBell: 8,
   hhFoot: -1,
+  /*
+    Din VCSL. Rimshot-ul și lovitura pe ramă stau pe toba mică și se deosebesc
+    prin cap: rimshot-ul e capul rotund tăiat oblic, lovitura pe ramă e × încercuit
+    (ca să nu se confunde cu cross-stick-ul, × simplu). Cowbell-ul e cap
+    triunghiular deasupra portativului, unde îl scriu chart-urile de latin.
+  */
+  rimshot: 5,
+  rimClick: 5,
+  cowbell: 9,
 }
 
 /** Cinelele se scriu cu ×, tobele cu cap rotund. Cross-stick-ul e și el ×. */
-export const CROSS_HEADS: readonly KitPiece[] = ['hhClosed', 'hhOpen', 'ride', 'crash', 'crossStick', 'hhFoot']
+export const CROSS_HEADS: readonly KitPiece[] = [
+  'hhClosed',
+  'hhOpen',
+  'ride',
+  'crash',
+  'crossStick',
+  'hhFoot',
+  'rimClick',
+]
 
 /** Clopotul ride-ului: cap în formă de romb, ca să nu se confunde cu ride-ul. */
 export const DIAMOND_HEADS: readonly KitPiece[] = ['rideBell']
+
+/** Cowbell-ul: cap triunghiular. */
+export const TRIANGLE_HEADS: readonly KitPiece[] = ['cowbell']
+
+/** Lovitura pe ramă: × încercuit, deosebit de cross-stick-ul (× simplu). */
+export const CIRCLED_HEADS: readonly KitPiece[] = ['rimClick']
+
+/** Rimshot-ul: cap rotund cu o linie oblică peste el. */
+export const SLASHED_HEADS: readonly KitPiece[] = ['rimshot']
 
 /** Piesele de la cea mai joasă la cea mai înaltă, ordinea cheii portativului. */
 export const LOW_TO_HIGH: readonly KitPiece[] = [
@@ -222,6 +248,9 @@ export function beamsFor(steps: number, stepsPerBeat: number): number {
   // Ternarul se scrie cu o singură bară, ca optimile: trei optimi pe un timp, cu
   // cifra 3 deasupra. Raportul (o treime) ar cădea altfel la două bare.
   if (stepsPerBeat % 3 === 0 && part >= 1 / 3) return 1
+  // Sextoletul (șase pe timp) se scrie cu două bare, ca șaisprezecimile, cu
+  // cifra 6 deasupra. Raportul (o șesime) ar cădea altfel la trei bare.
+  if (stepsPerBeat % 6 === 0 && part >= 1 / 6) return 2
   if (part >= 0.5) return 1
   if (part >= 0.25) return 2
   return 3
@@ -296,7 +325,17 @@ export function beamSegments(
  * diferența dintre o partitură care se citește și una care nu: bara peste
  * granița de timp ascunde exact ce caută ochiul, adică unde cade pulsul.
  */
-export function layOutStaffBar(columns: StaffHit[][], stepsPerBeat: number): StaffBarLayout {
+/**
+ * @param divisions Doar pe grila amestecată (`mixed-grid.ts`, 12 pași pe timp):
+ * în câte note se împarte fiecare timp. Duratele și barele se socotesc atunci în
+ * subdiviziunea timpului respectiv, iar cifra de tuplet (3 sau 6) se pune doar pe
+ * timpii care o cer, nu pe toată măsura.
+ */
+export function layOutStaffBar(
+  columns: StaffHit[][],
+  stepsPerBeat: number,
+  divisions?: readonly number[],
+): StaffBarLayout {
   const notes: StaffNote[] = []
   const rests: StaffRest[] = []
   const beams: StaffBeam[] = []
@@ -316,8 +355,17 @@ export function layOutStaffBar(columns: StaffHit[][], stepsPerBeat: number): Sta
     // Pauza de dinaintea primei lovituri din timp. După ea nu mai e nevoie de
     // niciuna: golul dintre două lovituri intră în durata scrisă a celei
     // dinainte (`writtenSteps`).
+    /*
+      Subdiviziunea în care se socotește timpul ăsta: pe grila obișnuită, cea a
+      măsurii; pe cea amestecată, cea a timpului (`divisions`). `unit` e câți
+      pași ai grilei face o notă din subdiviziunea lui.
+    */
+    const division = divisions?.[beat] ?? stepsPerBeat
+    const unit = stepsPerBeat / division
+    const beamsOf = (steps: number) => beamsFor(steps / unit, division)
+
     if (filled[0]! > start) {
-      rests.push({ step: start, beams: beamsFor(filled[0]! - start, stepsPerBeat) })
+      rests.push({ step: start, beams: beamsOf(filled[0]! - start) })
     }
 
     /*
@@ -342,7 +390,7 @@ export function layOutStaffBar(columns: StaffHit[][], stepsPerBeat: number): Sta
     const beamed = filled.length > 1 && stepsPerBeat > 1
     const group = filled.map((step) => ({
       step,
-      beams: beamsFor(writtenSteps(columns, step, stepsPerBeat), stepsPerBeat),
+      beams: beamsOf(writtenSteps(columns, step, stepsPerBeat)),
     }))
 
     if (beamed) {
@@ -354,7 +402,7 @@ export function layOutStaffBar(columns: StaffHit[][], stepsPerBeat: number): Sta
         ea. Pe hârtie, paranteza de triolet acoperă timpul chiar și când o notă
         lipsește; noi desenăm doar cifra, dar tot acolo.
       */
-      const tuplet = stepsPerBeat % 3 === 0 ? 3 : 0
+      const tuplet = division % 6 === 0 ? 6 : division % 3 === 0 ? 3 : 0
       beams.push(...beamSegments(group, { tuplet, stemTop }))
     }
 

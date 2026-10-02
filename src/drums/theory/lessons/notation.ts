@@ -696,8 +696,8 @@ export const notationLessons: DrumTheoryLesson<LocalizedText>[] = [
         heading: { ro: 'Cross-stick și rimshot', en: 'Cross-stick and rimshot' },
         visual: 'heads',
         body: {
-          ro: '**Cross-stick**: bățul culcat pe toba mică, coada lovind cercul; sunet sec, de lemn, folosit în balade. Se scrie cu **×** pe spațiul tobei mici, deci ×-ul nu înseamnă mereu cinel: poziția spune piesa. **Rimshot**: fața și cercul lovite deodată, cel mai tare sunet al tobei mici, scris cu o linie oblică peste cap. Rimshot-ul nu-l putem cânta încă: n-avem mostră pentru el.',
-          en: '**Cross-stick**: the stick laid on the snare, its butt striking the rim; a dry, wooden knock, used in ballads. Written as an **×** on the snare space, so an × does not always mean cymbal: the position tells you the piece. **Rimshot**: head and rim struck together, the loudest sound a snare makes, written with a slash through the head. We cannot play the rimshot yet: there is no sample for it.',
+          ro: '**Cross-stick**: bățul culcat pe toba mică, coada lovind cercul; sunet sec, de lemn, folosit în balade. Se scrie cu **×** pe spațiul tobei mici, deci ×-ul nu înseamnă mereu cinel: poziția spune piesa. **Rimshot**: fața și cercul lovite deodată, cel mai tare sunet al tobei mici, scris cu o linie oblică peste cap. Pe amândouă le auzi în exemplul următor.',
+          en: '**Cross-stick**: the stick laid on the snare, its butt striking the rim; a dry, wooden knock, used in ballads. Written as an **×** on the snare space, so an × does not always mean cymbal: the position tells you the piece. **Rimshot**: head and rim struck together, the loudest sound a snare makes, written with a slash through the head. You hear both in the next example.',
         },
         example: {
           caption: {
@@ -728,6 +728,42 @@ export const notationLessons: DrumTheoryLesson<LocalizedText>[] = [
             meaning: {
               ro: 'Fața tobei și cercul lovite deodată. Cel mai tare sunet al tobei mici.',
               en: 'Head and rim struck at once. The loudest sound a snare makes.',
+            },
+          },
+        ],
+      },
+      {
+        id: 'rimshot-si-rama',
+        heading: { ro: 'Rimshot și lovitura pe ramă', en: 'Rimshot and rim click' },
+        body: {
+          ro: 'Trei sunete din aceeași tobă: lovitura normală, **rimshot-ul**, tăios și tare, pentru backbeat-ul unui refren de rock, și **lovitura pe ramă**, doar vârful bățului pe cerc, un „tic” sec și subțire, folosit în reggae și latin. Pe portativ stau pe același spațiu; le deosebește capul: rotund, rotund tăiat, × încercuit.',
+          en: 'Three sounds from the same drum: the normal stroke, the **rimshot**, cutting and loud, for the backbeat of a rock chorus, and the **rim click**, just the stick tip on the hoop, a dry, thin "tick", used in reggae and Latin. On the staff they sit on the same space; the head tells them apart: round, round with a slash, circled ×.',
+        },
+        example: {
+          caption: {
+            ro: 'Backbeat-ul de trei ori: toba mică normală, rimshot, apoi lovitura pe ramă.',
+            en: 'The backbeat three times: normal snare, rimshot, then rim click.',
+          },
+          bpm: 76,
+          showStaff: true,
+          showGrid: true,
+          exercise: demoExercise({
+            id: 'demo-int-rimshot-rama',
+            stepsPerBar: 8,
+            rows: { hhClosed: 'xxxxxxxx', snare: '..x...x.', kick: 'x...x...' },
+            extraBars: [
+              { hhClosed: 'xxxxxxxx', rimshot: '..x...x.', kick: 'x...x...' },
+              { hhClosed: 'xxxxxxxx', rimClick: '..x...x.', kick: 'x...x...' },
+            ],
+            tempo: SLOW,
+          }),
+        },
+        terms: [
+          {
+            term: { ro: 'Lovitură pe ramă (rim click)', en: 'Rim click' },
+            meaning: {
+              ro: 'Doar vârful bățului pe cercul tobei mici. Un „tic” sec, mai subțire decât cross-stick-ul. Scris cu × încercuit.',
+              en: 'Only the stick tip on the snare’s hoop. A dry "tick", thinner than the cross-stick. Written as a circled ×.',
             },
           },
         ],
@@ -862,6 +898,57 @@ export const notationLessons: DrumTheoryLesson<LocalizedText>[] = [
           }),
         },
       },
+      {
+        id: 'shuffle-de-blues',
+        heading: { ro: 'Toba mare intră și ea în shuffle', en: 'The bass drum joins the shuffle' },
+        body: {
+          ro: 'În shuffle-ul de blues, și toba mare cade pe nota scurtă: pe ultima trioletă din timpul 2, chiar înainte de 3. Pe portativ, nota stă sub același 3 ca ride-ul, deci se citește la fel: lung-scurt.',
+          en: 'In a blues shuffle the bass drum lands on the short note too: on the last triplet of beat 2, just before 3. On the staff the note sits under the same 3 as the ride, so it reads the same way: long-short.',
+        },
+        example: {
+          caption: {
+            ro: 'Shuffle de blues: toba mare pe 1, pe „doi-let” și pe 3.',
+            en: 'A blues shuffle: bass drum on 1, on the last triplet of 2 and on 3.',
+          },
+          bpm: 80,
+          showStaff: true,
+          showGrid: true,
+          exercise: demoExercise({
+            id: 'demo-tri-blues',
+            /*
+              12 pași, 3 pe timp. Toba mare 0, 5, 6: timpul 1, ultima trioletă
+              din 2 (pasul 5), timpul 3. Mijlocul trioletei (1, 4, 7, 10) gol.
+            */
+            stepsPerBar: 12,
+            rows: { ride: 'x.xx.xx.xx.x', snare: '...x.....x..', kick: 'x....xx.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'citeste-trioletele',
+        heading: { ro: 'Citește: pătrimi și triolete', en: 'Read it: quarters and triplets' },
+        body: {
+          ro: 'Citește măsura înainte să apeși: pătrime, triolet, pătrime, triolet. Greșeala tipică: trioletul se grăbește spre timpul următor și iese ca două șaisprezecimi și o optime. Numără „unu-tri-o-let” cu voce tare și lasă cele trei note să umple tot timpul, egal.',
+          en: 'Read the bar before you press play: quarter, triplet, quarter, triplet. The typical slip: the triplet rushes towards the next beat and comes out as two sixteenths and an eighth. Count "one-trip-let" out loud and let the three notes fill the whole beat, evenly.',
+        },
+        example: {
+          caption: {
+            ro: 'Toba mică: pătrime pe 1 și 3, triolet pe 2 și 4.',
+            en: 'Snare: a quarter on 1 and 3, a triplet on 2 and 4.',
+          },
+          bpm: 72,
+          showStaff: true,
+          showGrid: false,
+          exercise: demoExercise({
+            id: 'demo-tri-citeste',
+            // 12 pași: timpul 1 doar pasul 0; timpul 2 pașii 3, 4, 5; timpul 3 doar 6; timpul 4 pașii 9, 10, 11.
+            stepsPerBar: 12,
+            rows: { snare: 'x..xxxx..xxx' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
     ],
   },
 
@@ -949,6 +1036,58 @@ export const notationLessons: DrumTheoryLesson<LocalizedText>[] = [
               kick: 'x...x...',
             },
             tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'crash-dupa-fill',
+        heading: { ro: 'Crash-ul după fill', en: 'The crash after a fill' },
+        body: {
+          ro: 'Cel mai des, crash-ul vine imediat după un fill: fill-ul împinge, crash-ul aterizează pe „unu”. Pe partitură le vezi unul lângă altul: notele dese de pe tomuri la capătul măsurii, apoi ×-ul de sus pe prima notă a măsurii următoare.',
+          en: 'Most often the crash comes right after a fill: the fill pushes, the crash lands on one. On paper you see them side by side: the busy tom notes at the end of the bar, then the high × on the first note of the next bar.',
+        },
+        example: {
+          caption: {
+            ro: 'Groove cu un fill scurt pe timpul 4, apoi crash pe „unu”.',
+            en: 'A groove with a short fill on beat 4, then a crash on one.',
+          },
+          bpm: 84,
+          showStaff: true,
+          showGrid: false,
+          exercise: demoExercise({
+            id: 'demo-dubla-dupa-fill',
+            /*
+              8 pași. Măsura 1: fill pe timpul 4, tomul pe 6, cazanul pe 7.
+              Măsura 2: crash pe 0, odată cu toba mare.
+            */
+            stepsPerBar: 8,
+            rows: { hhClosed: 'xxxxxx..', snare: '..x.....', tom: '......x.', floor: '.......x', kick: 'x...x...' },
+            extraBars: [{ crash: 'x.......', hhClosed: '.xxxxxxx', snare: '..x...x.', kick: 'x...x...' }],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'dubla-in-rafale',
+        heading: { ro: 'Dubla în rafale', en: 'Double bass in bursts' },
+        body: {
+          ro: 'Dubla nu ține mereu toată măsura. Des apare în rafale: un timp de șaisprezecimi, apoi liniște. Pe portativ, o rafală e un grup de patru note legate cu două bare, jos de tot. Citește grupurile, nu notele: un grup e un timp.',
+          en: 'Double bass does not always fill the bar. It often comes in bursts: one beat of sixteenths, then space. On the staff a burst is a group of four notes joined by two beams, right at the bottom. Read the groups, not the notes: one group is one beat.',
+        },
+        example: {
+          caption: {
+            ro: 'Rafale de șaisprezecimi pe 1 și pe 3, backbeat pe 2 și 4.',
+            en: 'Sixteenth-note bursts on 1 and 3, backbeat on 2 and 4.',
+          },
+          bpm: 76,
+          showStaff: true,
+          showGrid: true,
+          exercise: demoExercise({
+            id: 'demo-dubla-rafale',
+            // 16 pași: toba mare pe 0-3 și 8-11 (timpii 1 și 3 întregi), toba mică pe 4 și 12.
+            stepsPerBar: 16,
+            rows: { hhClosed: 'x...x...x...x...', snare: '....x.......x...', kick: 'xxxx....xxxx....' },
+            tempo: SIXTEENTHS,
           }),
         },
       },

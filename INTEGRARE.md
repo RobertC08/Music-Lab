@@ -7,6 +7,9 @@ ca să poată fi rulat izolat.
 Context și decizii de design: [STARE.md](STARE.md). Ce urmează:
 [PLAN-RITM.md](PLAN-RITM.md).
 
+Pentru modulul de **tobe** (manual, quiz-uri, însoțitorul de practică):
+[INTEGRARE-TOBE.md](INTEGRARE-TOBE.md).
+
 ---
 
 ## Ce se copiază

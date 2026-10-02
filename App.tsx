@@ -3,16 +3,18 @@ import { ActivityIndicator, SafeAreaView, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useFonts } from 'expo-font'
-import './src/i18n'
+import i18n from './src/i18n'
 import { colors } from './src/theme'
 import { Home } from './src/screens/Home'
 import { PolyrhythmGame } from './src/components/screens/PolyrhythmGame'
 import { RudimentPracticeScreen } from './src/components/drums/screens/RudimentPracticeScreen'
 import { GroovePracticeScreen } from './src/components/drums/screens/GroovePracticeScreen'
 import { FillPracticeScreen } from './src/components/drums/screens/FillPracticeScreen'
-import { TheoryIndexScreen } from './src/components/drums/theory/TheoryIndexScreen'
+import { AdvancedFillPracticeScreen } from './src/components/drums/screens/AdvancedFillPracticeScreen'
+import { TheoryIndexScreen, type QuizScores } from './src/components/drums/theory/TheoryIndexScreen'
+import { DrumQuizScreen } from './src/components/drums/theory/quiz/QuizScreen'
 import { DrumTheoryLessonScreen } from './src/components/drums/theory/LessonScreen'
-import { getDrumTheory } from './src/drums/theory'
+import { getDrumTheory, quizForLesson } from './src/drums/theory'
 import { CategoryScreen } from './src/screens/CategoryScreen'
 import { LessonScreen } from './src/screens/LessonScreen'
 import { RhythmEchoGame } from './src/screens/RhythmEchoGame'
@@ -20,7 +22,7 @@ import { ReadRhythmGame } from './src/screens/ReadRhythmGame'
 import { CheatSheet } from './src/screens/CheatSheet'
 import { TimingBench } from './src/screens/TimingBench'
 import type { Category, Lesson } from './src/curriculum/types'
-import type { DrumTheoryLesson } from './src/drums/theory'
+import type { DrumQuiz, DrumTheoryLesson } from './src/drums/theory'
 
 type Screen =
   | 'home'
@@ -34,8 +36,10 @@ type Screen =
   | 'drums'
   | 'grooves'
   | 'fills'
+  | 'advancedFills'
   | 'theory'
   | 'theoryLesson'
+  | 'theoryQuiz'
 
 
 export default function App() {
@@ -43,6 +47,13 @@ export default function App() {
   const [category, setCategory] = useState<Category | null>(null)
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [theoryLesson, setTheoryLesson] = useState<DrumTheoryLesson | null>(null)
+  const [theoryQuiz, setTheoryQuiz] = useState<DrumQuiz | null>(null)
+  /*
+    Cel mai bun scor la fiecare quiz, doar în memorie: sandbox-ul n-are unde să
+    salveze. În aplicație, scorul intră în progresul local (store-ul de oaspete),
+    lângă recordurile de tempo.
+  */
+  const [quizScores, setQuizScores] = useState<QuizScores>({})
   /*
     Sandbox-ul n-are profil, deci nici limbă aleasă de utilizator: manualul se
     cere în română, ca restul ecranelor de aici. În aplicație, limba vine din
@@ -80,6 +91,7 @@ export default function App() {
           onOpenDrums={() => setScreen('drums')}
           onOpenGrooves={() => setScreen('grooves')}
           onOpenFills={() => setScreen('fills')}
+          onOpenAdvancedFills={() => setScreen('advancedFills')}
         />
       ) : screen === 'drums' ? (
         <RudimentPracticeScreen onExit={() => setScreen('home')} />
@@ -87,12 +99,19 @@ export default function App() {
         <GroovePracticeScreen onExit={() => setScreen('home')} />
       ) : screen === 'fills' ? (
         <FillPracticeScreen onExit={() => setScreen('home')} />
+      ) : screen === 'advancedFills' ? (
+        <AdvancedFillPracticeScreen onExit={() => setScreen('home')} />
       ) : screen === 'theory' ? (
         <TheoryIndexScreen
           theory={theory}
+          scores={quizScores}
           onOpenLesson={(value) => {
             setTheoryLesson(value)
             setScreen('theoryLesson')
+          }}
+          onOpenQuiz={(value) => {
+            setTheoryQuiz(value)
+            setScreen('theoryQuiz')
           }}
           onExit={() => setScreen('home')}
         />
@@ -101,6 +120,37 @@ export default function App() {
           lesson={theoryLesson}
           stage={theory.stages.find((item) => item.id === theoryLesson.stage)!}
           onExit={() => setScreen('theory')}
+          onOpenQuiz={(() => {
+            const quiz = quizForLesson(theory, theoryLesson.id)
+            return quiz
+              ? () => {
+                  setTheoryQuiz(quiz)
+                  setScreen('theoryQuiz')
+                }
+              : undefined
+          })()}
+        />
+      ) : screen === 'theoryQuiz' && theoryQuiz ? (
+        <DrumQuizScreen
+          quiz={theoryQuiz}
+          stage={theory.stages.find((item) => item.id === theoryQuiz.stage)!}
+          title={
+            theoryQuiz.lessonId
+              ? i18n.t('drums.quizLessonTitle', {
+                  lesson: theory.lessons.find((item) => item.id === theoryQuiz.lessonId)?.title,
+                })
+              : i18n.t('drums.quizReviewTitle', {
+                  stage: theory.stages.find((item) => item.id === theoryQuiz.stage)?.title,
+                })
+          }
+          onExit={() => setScreen('theory')}
+          onFinish={(score, total) =>
+            setQuizScores((current) => {
+              const best = current[theoryQuiz.id]
+              if (best && best.score >= score) return current
+              return { ...current, [theoryQuiz.id]: { score, total } }
+            })
+          }
         />
       ) : screen === 'polyrhythm' ? (
         <PolyrhythmGame onExit={backToCategory} />

@@ -1,9 +1,15 @@
-import { useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import Svg, { Ellipse, G, Path, Rect } from 'react-native-svg'
 import { publicColors } from '@/components/public-practice/ui'
-import { basePieces, soundsOn, type BasePiece, type KitPiece } from '@/lib/drums/exercise'
+import {
+  basePieces,
+  soundsOn,
+  type BasePiece,
+  type DrawnPiece,
+  type KitPiece,
+} from '@/lib/drums/exercise'
 import { kitIfLoaded } from '@/lib/drums/kit'
 import { usePieceSound } from '@/lib/drums/theory/use-piece-sound'
 import { haptic } from '@/lib/haptics/game-haptics'
@@ -53,6 +59,18 @@ const BRASS_DARK = '#A8871C'
   hi-hat-uri, ceea ce e exact confuzia pe care lecția o repară. Loviturile din
   DRSKit (cross-stick, mătura, fusul cu piciorul, clopotul) nu sunt piese, deci
   nici ele nu se desenează: se aprind pe piesa pe care cad (`soundsOn`).
+
+  Excepția e talanga: ea chiar e un instrument în plus, prins pe cercul tobei
+  mari, deci se desenează acolo și se aprinde singură. Nu e atingibilă și n-are
+  buton: lecția „Setul și piesele” predă setul de bază, nu accesoriile.
+*/
+
+/** Talanga: o cutie de metal îngustată, prinsă cu o tijă de cercul tobei mari. */
+const COWBELL = '#9A7B12'
+const STEEL = '#5B636B'
+const STEEL_LIGHT = '#8E979F'
+
+/*
 */
 const drawnPieces = basePieces.filter((piece) => piece !== 'hhOpen')
 
@@ -248,7 +266,7 @@ function Cymbal({
  * @param lit Piesele care sună în clipa asta. În lecție vine de la atingere, la
  * exemplu de la ceasul pistei.
  */
-export function KitDrawing({
+function KitDrawingView({
   lit,
   onTapPiece,
   compact = false,
@@ -266,7 +284,8 @@ export function KitDrawing({
    */
   compact?: boolean
 }) {
-  const on = (piece: BasePiece) => lit.some((struck) => soundsOn[struck] === piece)
+  const on = (piece: DrawnPiece) => lit.some((struck) => soundsOn[struck] === piece)
+  const cowbellOn = on('cowbell')
 
   /*
     Fiecare piesă e desenată în CULOAREA EI, nu în gri.
@@ -371,6 +390,24 @@ export function KitDrawing({
               ) : null}
               {/* Pedala, în fața tobei mari. */}
               <Path d="M164 196 h22 M172 190 v8" stroke={CHROME} strokeWidth={2.6} strokeLinecap="round" fill="none" />
+            </G>
+
+            {/*
+              Talanga, pe cercul tobei mari, în dreapta sus, între toba mare și
+              cazan, unde o prinde orice toboșar care o folosește. Gura largă
+              spre toboșar, capătul îngust spre clemă.
+            */}
+            <G>
+              <Path d="M206 122 L222 110" stroke={CHROME} strokeWidth={2.4} strokeLinecap="round" />
+              <Path
+                d="M218 104 L238 98 L240 116 L220 116 Z"
+                fill={cowbellOn ? COWBELL : STEEL}
+                stroke={COWBELL}
+                strokeOpacity={cowbellOn ? 1 : 0.55}
+                strokeWidth={cowbellOn ? 2.4 : 1.4}
+                strokeLinejoin="round"
+              />
+              <Path d="M221 106 L236 102" stroke={STEEL_LIGHT} strokeWidth={1.4} strokeLinecap="round" opacity={0.8} />
             </G>
 
             {/* Toba mică, cea mai în față. */}
@@ -499,3 +536,16 @@ export function KitDiagram() {
     </View>
   )
 }
+
+/*
+  Memoizat: în timpul redării, ecranul care îl conține se redesenează la fiecare
+  cadru (poziția din pistă), dar acesta se schimbă doar când trece un pas. Fără
+  memo, toate celulele se refăceau de ~60 de ori pe secundă, iar în modul de
+  dezvoltare asta se simțea ca lag pe telefon.
+*/
+export const KitDrawing = memo(KitDrawingView, (before, after) =>
+  before.compact === after.compact &&
+  before.onTapPiece === after.onTapPiece &&
+  // `lit` e o listă nouă la fiecare cadru; contează doar ce piese conține.
+  before.lit.length === after.lit.length &&
+  before.lit.every((piece, index) => piece === after.lit[index]))

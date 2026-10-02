@@ -14,8 +14,12 @@ const catalogue: PracticeCatalogue = {
   pickKey: 'drums.pickGroove',
   exercises: grooves,
   textOf: grooveText,
+  // Titlu pe stil: cu niveluri pe fiecare stil, lista a devenit prea lungă ca să fie plată.
+  groupOf: (exercise) => (exercise.style ? `drums.grooveStyle_${exercise.style}` : null),
   modes: [steadyMode, ladderMode, genreSwitchMode, survivalMode],
   showKit: true,
+  // Și pe portativ, cu comutatorul „Grilă / Portativ”.
+  staffNotation: true,
   renderNotation: (props) => <GrooveGrid {...props} />,
 }
 

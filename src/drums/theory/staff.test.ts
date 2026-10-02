@@ -1,3 +1,4 @@
+import { beatsRow, MIXED_STEPS_PER_BEAT } from '../mixed-grid'
 import { describe, expect, it } from 'vitest'
 import { kitPieces, type KitPiece } from '../exercise'
 import { theoryBar } from './bars'
@@ -52,10 +53,14 @@ describe('pozițiile pe portativ', () => {
     expect(STAFF_POSITION.hhFoot).toBe(-1)
     // ×-ul de pe toba mică (cross-stick) și cel de sub portativ (fusul cu
     // piciorul) nu sunt cinele: ×-ul spune alt fel de lovitură, poziția spune piesa.
-    for (const cymbal of CROSS_HEADS.filter((piece) => piece !== 'crossStick' && piece !== 'hhFoot')) {
+    // Lovitura pe ramă e tot ×, tot pe toba mică, deosebită de cross-stick prin cerc.
+    const notCymbals = ['crossStick', 'hhFoot', 'rimClick']
+    for (const cymbal of CROSS_HEADS.filter((piece) => !notCymbals.includes(piece))) {
       expect(STAFF_POSITION[cymbal], cymbal).toBeGreaterThanOrEqual(STAFF_POSITION.tom)
     }
     expect(STAFF_POSITION.crossStick).toBe(STAFF_POSITION.snare)
+    expect(STAFF_POSITION.rimClick).toBe(STAFF_POSITION.snare)
+    expect(STAFF_POSITION.rimshot).toBe(STAFF_POSITION.snare)
   })
 
   it('urcă odată cu sunetul la tobe: mare, cazan, tom 2, tom 1', () => {
@@ -320,5 +325,36 @@ describe('lecția despre valori', () => {
     expect(beams.has(0), 'pătrimi').toBe(true)
     expect(beams.has(1), 'optimi').toBe(true)
     expect(beams.has(2), 'șaisprezecimi').toBe(true)
+  })
+})
+
+describe('portativul pe grila amestecată', () => {
+  // Timpul 1 șaisprezecimi, 2 triolet, 3 sextolet, 4 optimi, pe toba mică.
+  const row = beatsRow('xxxx|xxx|xxxxxx|xx')
+  const columns = [...row].map((character) =>
+    character === 'x' ? [{ piece: 'snare' as const, hit: 'normal' as const }] : [],
+  )
+  const layout = layOutStaffBar(columns, MIXED_STEPS_PER_BEAT, [4, 3, 6, 2])
+  const beamsOn = (beat: number) =>
+    layout.notes
+      .filter((note) => Math.floor(note.step / MIXED_STEPS_PER_BEAT) === beat)
+      .map((note) => note.beams)
+  const tupletOn = (beat: number) =>
+    layout.beams.find(
+      (beam) => beam.level === 1 && Math.floor(beam.from / MIXED_STEPS_PER_BEAT) === beat,
+    )?.tuplet
+
+  it('scrie fiecare timp în subdiviziunea lui', () => {
+    expect(beamsOn(0)).toEqual([2, 2, 2, 2])
+    expect(beamsOn(1)).toEqual([1, 1, 1])
+    expect(beamsOn(2)).toEqual([2, 2, 2, 2, 2, 2])
+    expect(beamsOn(3)).toEqual([1, 1])
+  })
+
+  it('pune cifra de tuplet doar pe timpii care o cer', () => {
+    expect(tupletOn(0)).toBe(0)
+    expect(tupletOn(1)).toBe(3)
+    expect(tupletOn(2)).toBe(6)
+    expect(tupletOn(3)).toBe(0)
   })
 })

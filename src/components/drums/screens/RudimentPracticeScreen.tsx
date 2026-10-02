@@ -1,3 +1,4 @@
+import { WithCursor } from '@/components/drums/live'
 import { StickingRow } from '@/components/drums/sticking-row'
 import { PracticeScreen, type PracticeCatalogue } from '@/components/drums/screens/PracticeScreen'
 import { ladderMode, rouletteMode, steadyMode } from '@/lib/drums/modes'
@@ -12,7 +13,12 @@ const catalogue: PracticeCatalogue = {
   exercises: rudiments,
   textOf: rudimentText,
   modes: [steadyMode, ladderMode, rouletteMode],
-  renderNotation: (props) => <StickingRow {...props} />,
+  // Rândul de mâini primește pasul printr-un adaptor abonat la ceas (`live.tsx`).
+  renderNotation: ({ cursor, ...props }) => (
+    <WithCursor cursor={cursor}>
+      {(bar, step) => <StickingRow {...props} activeBar={bar} activeStep={step} />}
+    </WithCursor>
+  ),
 }
 
 export function RudimentPracticeScreen({ onExit }: { onExit: () => void }) {

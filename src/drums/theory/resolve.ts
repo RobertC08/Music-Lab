@@ -1,4 +1,5 @@
 import { pick, type CurriculumLanguage, type LocalizedText } from '@/lib/rhythm/curriculum/localized'
+import { resolveQuiz } from './quiz'
 import type { DrumTheory, DrumTheoryLesson, DrumTheorySection } from './types'
 
 /*
@@ -24,7 +25,21 @@ function resolveSection(
     ...rest,
     heading: pick(section.heading, language),
     body: pick(section.body, language),
-    ...(example ? { example: { ...example, caption: pick(example.caption, language) } } : {}),
+    ...(example
+      ? {
+          example: {
+            ...example,
+            caption: pick(example.caption, language),
+            ...(example.chart
+              ? {
+                  chart: example.chart.map(({ label, ...bar }) =>
+                    label ? { ...bar, label: pick(label, language) } : bar,
+                  ),
+                }
+              : {}),
+          },
+        }
+      : {}),
     ...(terms
       ? {
           terms: terms.map((entry) => ({
@@ -59,5 +74,6 @@ export function resolveDrumTheory(
       subtitle: pick(stage.subtitle, language),
     })),
     lessons: theory.lessons.map((lesson) => resolveLesson(lesson, language)),
+    quizzes: (theory.quizzes ?? []).map((quiz) => resolveQuiz(quiz, language)),
   }
 }

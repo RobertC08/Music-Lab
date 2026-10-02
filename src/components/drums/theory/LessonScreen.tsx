@@ -28,10 +28,13 @@ export function DrumTheoryLessonScreen({
   lesson,
   stage,
   onExit,
+  onOpenQuiz,
 }: {
   lesson: DrumTheoryLesson
   stage: DrumStage
   onExit: () => void
+  /** Quiz-ul lecției. Dacă există, ultimul pas duce acolo, nu înapoi la listă. */
+  onOpenQuiz?: () => void
 }) {
   const { t } = useTranslation()
   const [index, setIndex] = useState(0)
@@ -190,11 +193,18 @@ export function DrumTheoryLessonScreen({
           ) : null}
           <View style={{ flex: 2 }}>
             <PrimaryButton
-              label={isLast ? t('drums.theoryLessonDone') : t('common.continue')}
+              label={
+                isLast
+                  ? onOpenQuiz
+                    ? t('drums.quizStart')
+                    : t('drums.theoryLessonDone')
+                  : t('common.continue')
+              }
               onPress={() => {
                 haptic('light')
-                if (isLast) onExit()
-                else setIndex(index + 1)
+                if (!isLast) setIndex(index + 1)
+                else if (onOpenQuiz) onOpenQuiz()
+                else onExit()
               }}
             />
           </View>

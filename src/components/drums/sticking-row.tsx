@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { publicColors } from '@/components/public-practice/ui'
@@ -27,7 +28,7 @@ export interface StickingRowProps {
   showHint?: boolean
 }
 
-export function StickingRow({
+function StickingRowView({
   exercise,
   activeBar = -1,
   activeStep = -1,
@@ -144,3 +145,11 @@ export function StickingRow({
     </View>
   )
 }
+
+/*
+  Memoizat: în timpul redării, ecranul care îl conține se redesenează la fiecare
+  cadru (poziția din pistă), dar acesta se schimbă doar când trece un pas. Fără
+  memo, toate celulele se refăceau de ~60 de ori pe secundă, iar în modul de
+  dezvoltare asta se simțea ca lag pe telefon.
+*/
+export const StickingRow = memo(StickingRowView)

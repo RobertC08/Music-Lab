@@ -1,14 +1,19 @@
-import { View } from 'react-native'
+import { memo } from 'react'
+import { Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import Svg, { Ellipse, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg'
 import { publicColors } from '@/components/public-practice/ui'
 import { type Bar, type DrumExercise, type Hit, type KitPiece } from '@/lib/drums/exercise'
+import { beatDivisions, MIXED_STEPS_PER_BEAT } from '@/lib/drums/mixed-grid'
 import { displayBarsOf } from '@/lib/drums/notation-bars'
 import {
   BEAM_GAP,
   BEAM_H,
   BEAM_STUB,
   CROSS_HEADS,
+  CIRCLED_HEADS,
+  SLASHED_HEADS,
+  TRIANGLE_HEADS,
   DIAMOND_HEADS,
   HEAD_RX,
   HEAD_RY,
@@ -67,25 +72,53 @@ export interface DrumStaffProps {
  * Aceleași măsuri identice se strâng cu „×2" ca la grilă (`collapseBars`): un
  * exemplu de manual se citește dintr-o privire sau nu se citește deloc.
  */
-export function DrumStaff({
+function DrumStaffView({
   exercise,
   activeBar = -1,
   activeStep = -1,
   accent = publicColors.ink,
 }: DrumStaffProps) {
+  const { t } = useTranslation()
   const displayBars = displayBarsOf(exercise)
   return (
     <View style={{ gap: 8 }}>
-      {displayBars.map(({ bar, sourceBars }, index) => (
-        <StaffBar
-          key={index}
-          exercise={exercise}
-          lanes={bar.lanes}
-          repeats={sourceBars.length}
-          activeStep={sourceBars.includes(activeBar) ? activeStep : -1}
-          accent={accent}
-        />
-      ))}
+      {displayBars.map(({ bar, sourceBars }, index) => {
+        const staff = (
+          <StaffBar
+            key={index}
+            exercise={exercise}
+            lanes={bar.lanes}
+            repeats={sourceBars.length}
+            activeStep={sourceBars.includes(activeBar) ? activeStep : -1}
+            accent={accent}
+          />
+        )
+        /*
+          Măsura de fill, încadrată ca pe grilă: la practică acolo tace aplicația
+          și intri tu, deci trebuie să se vadă și pe portativ unde începe.
+        */
+        return bar.fill ? (
+          <View
+            key={index}
+            style={{ borderWidth: 2, borderColor: publicColors.green, borderRadius: 10, padding: 4, gap: 2 }}
+          >
+            <Text
+              style={{
+                fontSize: 9,
+                fontWeight: '800',
+                letterSpacing: 0.8,
+                color: publicColors.green,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('drums.yourBar')}
+            </Text>
+            {staff}
+          </View>
+        ) : (
+          staff
+        )
+      })}
     </View>
   )
 }
@@ -106,10 +139,9 @@ export function DrumStaff({
  * doar prin cap și prin semnul de deasupra. De aceea legenda le pune una lângă
  * alta: separate, în cinci exemple, nimeni n-ar vedea că diferența e chiar asta.
  *
- * Cross-stick-ul și rimshot-ul nu se aud în aplicație: kitul n-are mostre pentru
- * ele. Deci se predau citite, nu ascultate, iar lecția o spune pe față, un
- * exemplu care ar reda o tobă mică normală în locul lor ar preda greșit tocmai
- * ce încearcă să arate.
+ * Între timp toate au mostre: cross-stick-ul din DRSKit, rimshot-ul și
+ * lovitura pe ramă din VCSL. Legenda rămâne, fiindcă tot asta e de citit: un
+ * singur spațiu, cinci capete.
  */
 export function DrumHeadsKey() {
   const { t } = useTranslation()
@@ -248,11 +280,36 @@ function StaffBar({
 }) {
   const { stepsPerBar, beatsPerBar } = exercise
   const stepsPerBeat = stepsPerBar / beatsPerBar
+  /*
+    Pe grila amestecată (`mixed-grid.ts`) fiecare timp are subdiviziunea lui, iar
+    timpii au aceeași lățime: notele unui timp se împart egal în ea. Așa un
+    sextolet și o șaisprezecime stau pe aceeași lungime de timp, cum se și aud,
+    iar măsura nu se întinde pe 48 de pași.
+  */
+  const mixed = stepsPerBeat === MIXED_STEPS_PER_BEAT
+  const divisions = mixed ? beatDivisions({ lanes }, stepsPerBar, beatsPerBar) : null
   // Pașii înghesuiți primesc mai puțin loc, dar nu sub lățimea unui cap de notă
   // cu codiță: sub atât, două șaisprezecimi alăturate se ating.
   const stepW = stepsPerBar > 8 ? 15 : 24
-  const width = HEAD_W + stepsPerBar * stepW + 10
-  const xOf = (step: number) => HEAD_W + stepW * step + stepW / 2
+  /** Pe grila amestecată, lățimea unui timp: încap șase note fără să se atingă. */
+  const BEAT_W = 72
+  const width = mixed ? HEAD_W + beatsPerBar * BEAT_W + 10 : HEAD_W + stepsPerBar * stepW + 10
+  /** Lățimea notei de la un pas: un pas pe grila obișnuită, o subdiviziune pe cea amestecată. */
+  const cellW = (step: number) =>
+    divisions ? BEAT_W / divisions[Math.floor(step / stepsPerBeat)]! : stepW
+  const xOf = (step: number) => {
+    if (!divisions) return HEAD_W + stepW * step + stepW / 2
+    const beat = Math.floor(step / stepsPerBeat)
+    const offset = step % stepsPerBeat
+    return HEAD_W + beat * BEAT_W + (offset / stepsPerBeat) * BEAT_W + cellW(step) / 2
+  }
+  /** Pasul de început al notei care cuprinde `step` (pe grila amestecată, o notă ține mai mulți pași). */
+  const cellStart = (step: number) => {
+    if (!divisions || step < 0) return step
+    const unit = stepsPerBeat / divisions[Math.floor(step / stepsPerBeat)]!
+    return step - (step % unit)
+  }
+  const litStep = cellStart(activeStep)
 
   const columns = Array.from({ length: stepsPerBar }, (_, step) =>
     (Object.keys(lanes) as KitPiece[]).flatMap((piece) => {
@@ -260,7 +317,7 @@ function StaffBar({
       return hit ? [{ piece, hit }] : []
     }),
   )
-  const events = layOutStaffBar(columns, stepsPerBeat)
+  const events = layOutStaffBar(columns, stepsPerBeat, divisions ?? undefined)
 
   return (
     <Scaled width={width} height={STAFF_HEIGHT}>
@@ -270,9 +327,9 @@ function StaffBar({
       */}
       {activeStep >= 0 ? (
         <Rect
-          x={xOf(activeStep) - stepW / 2}
+          x={xOf(litStep) - cellW(litStep) / 2}
           y={STAFF_TOP - 20}
-          width={stepW}
+          width={cellW(litStep)}
           height={STAFF_H + 30}
           rx={5}
           fill={accent}
@@ -289,7 +346,7 @@ function StaffBar({
       ))}
 
       {events.notes.map((event) => {
-        const lit = event.step === activeStep
+        const lit = event.step === litStep
         const color = lit ? accent : publicColors.ink
         return (
           <G key={`n${event.step}`}>
@@ -529,7 +586,14 @@ function NoteHead({
           strokeWidth={1.2}
         />
       ) : null}
-      {DIAMOND_HEADS.includes(piece) ? (
+      {TRIANGLE_HEADS.includes(piece) ? (
+        <Path
+          d={`M${x} ${y - 4.5} L${x + 5} ${y + 4} L${x - 5} ${y + 4} Z`}
+          stroke={color}
+          strokeWidth={1.6}
+          fill="none"
+        />
+      ) : DIAMOND_HEADS.includes(piece) ? (
         <Path
           d={`M${x} ${y - 4.5} L${x + 4.5} ${y} L${x} ${y + 4.5} L${x - 4.5} ${y} Z`}
           stroke={color}
@@ -567,6 +631,22 @@ function NoteHead({
           transform={`rotate(-20 ${x} ${y})`}
         />
       )}
+      {/* Lovitura pe ramă: cerc în jurul ×-ului. */}
+      {CIRCLED_HEADS.includes(piece) ? (
+        <Ellipse cx={x} cy={y} rx={6.5} ry={6.5} fill="none" stroke={color} strokeWidth={1.2} />
+      ) : null}
+      {/* Rimshot: linia oblică peste cap, ca în legenda felurilor de lovitură. */}
+      {SLASHED_HEADS.includes(piece) ? (
+        <Line
+          x1={x - 7}
+          x2={x + 7}
+          y1={y + 6}
+          y2={y - 6}
+          stroke={color}
+          strokeWidth={1.6}
+          strokeLinecap="round"
+        />
+      ) : null}
       {/* Fusul deschis: cerculețul deasupra ×-ului, convenția standard. */}
       {piece === 'hhOpen' ? (
         <Ellipse
@@ -741,3 +821,11 @@ function BeatNumbers({
     </G>
   )
 }
+
+/*
+  Memoizat: în timpul redării, ecranul care îl conține se redesenează la fiecare
+  cadru (poziția din pistă), dar acesta se schimbă doar când trece un pas. Fără
+  memo, toate celulele se refăceau de ~60 de ori pe secundă, iar în modul de
+  dezvoltare asta se simțea ca lag pe telefon.
+*/
+export const DrumStaff = memo(DrumStaffView)

@@ -1,3 +1,4 @@
+import { BASS_GAIN, bassVoice, placeBass, type BassLine } from './bass'
 import type { Hit, KitPiece } from './exercise'
 import type { DrumPlan } from './plan'
 import { SAMPLE_RATE, encodeWav } from './wav'
@@ -53,6 +54,14 @@ export const DEFAULT_MIX: Record<KitPiece, number> = {
   hhFoot: 0.45,
   rideBell: 0.6,
   brush: 1,
+  /*
+    Din VCSL. Rimshot-ul e cel mai tare sunet al tobei mici și așa rămâne;
+    cowbell-ul stă sub backbeat, iar lovitura pe ramă puțin peste cross-stick,
+    fiindcă e un sunet mai scurt și mai sec.
+  */
+  cowbell: 0.7,
+  rimshot: 0.95,
+  rimClick: 1.1,
 }
 
 /**
@@ -123,6 +132,11 @@ export interface RenderOptions {
    * sau ai întârziat, o auzi, te calci pe cinel, sau apari după el.
    */
   gap?: boolean
+  /**
+   * Linia de bas de sub exemplu (`bass.ts`). Se aude și cu tobele oprite: atunci
+   * ține ea locul trupei, iar tu legi toba mare de ea.
+   */
+  bass?: BassLine
 }
 
 export interface RenderedTrack {
@@ -188,6 +202,16 @@ export function renderDrumTrack(plan: DrumPlan, options: RenderOptions): Rendere
     }
   }
 
+  if (options.bass) {
+    for (const note of placeBass(plan, options.bass)) {
+      placements.push({
+        at: sampleAt(note.atMs),
+        source: bassVoice(note.pitch, note.durationMs),
+        gain: BASS_GAIN,
+      })
+    }
+  }
+
   /*
     Lungimea tamponului e dictată de ce se aude ultimul, nu de ultima bătaie.
     Tăiat la `totalMs`, un crash pe măsura finală s-ar opri brusc, și un sunet
@@ -244,7 +268,7 @@ export function renderDrumWav(plan: DrumPlan, options: RenderOptions): Uint8Arra
 export function drumTrackKey(
   plan: DrumPlan,
   kitId: string,
-  options: Pick<RenderOptions, 'mix' | 'clicks' | 'hits' | 'gap' | 'loop'>,
+  options: Pick<RenderOptions, 'mix' | 'clicks' | 'hits' | 'gap' | 'loop' | 'bass'>,
 ) {
   const parts = [
     kitId,
@@ -266,6 +290,12 @@ export function drumTrackKey(
       .map(([level, gain]) => `${level}:${gain}`)
       .join(','),
     plan.totalMs.toFixed(2),
+    // Basul intră cu notele lui, nu cu un nume: o notă mutată e altă pistă.
+    options.bass
+      ? `bass:${BASS_GAIN}:${options.bass.bars
+          .map((notes) => notes.map((note) => `${note.step}+${note.length}=${note.pitch}`).join(','))
+          .join(';')}`
+      : 'nobass',
     plan.hits.map((hit) => `${hit.atMs.toFixed(2)}${hit.piece}${hit.hit}`).join('|'),
     plan.clicks.map((click) => `${click.atMs.toFixed(2)}${click.accent ? 'A' : 'p'}`).join('|'),
   ].join('/')

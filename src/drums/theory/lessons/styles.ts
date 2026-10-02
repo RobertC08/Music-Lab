@@ -91,6 +91,47 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
           }),
         },
       },
+      {
+        id: 'rock-4',
+        heading: { ro: 'Nivelul 4 · Refrenul pe ride', en: 'Level 4 · The chorus on the ride' },
+        body: {
+          ro: 'La refren, rock-ul mută timpul pe ride și deschide toba mare: crash pe „unu”, ride pe optimi, toba mare pe 1, „doi-și”, 3 și „patru-și”, iar backbeat-ul trece pe **rimshot**: fața și cercul lovite deodată, ca să taie prin chitarele distorsionate.',
+          en: 'In the chorus, rock moves the time to the ride and opens up the bass drum: crash on one, ride in eighths, bass drum on 1, the "and" of 2, 3 and the "and" of 4, and the backbeat moves to a **rimshot**: head and rim struck together, to cut through the distorted guitars.',
+        },
+        example: {
+          caption: { ro: 'Crash pe „unu”, ride pe optimi, rimshot pe 2 și 4, toba mare care împinge.', en: 'Crash on one, ride in eighths, rimshot on 2 and 4, a pushing bass drum.' },
+          bpm: 112,
+          exercise: demoExercise({
+            id: 'demo-stil-rock-4',
+            // Toba mare: pașii 0, 3, 4, 7 = 1, „doi-și”, 3, „patru-și”.
+            stepsPerBar: 8,
+            rows: { crash: 'x.......', ride: '.xxxxxxx', rimshot: '..x...x.', kick: 'x..xx..x' },
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'rock-exersat',
+        heading: { ro: 'Exersează rock-ul', en: 'Practise the rock' },
+        body: {
+          ro: 'Cântă nivelul 2 peste exemplu. Greșeala tipică: fusul deschis pe „patru-și” nu se mai închide pe „unu” și sună ca un zgomot peste toată măsura. Închide-l cu piciorul exact odată cu toba mare. În Groove-uri, rock-ul are cinci niveluri de exersat.',
+          en: 'Play level 2 over the example. The typical slip: the hi-hat opened on the "and" of 4 does not close on one and washes over the whole bar. Close it with your foot exactly with the bass drum. In Grooves, rock has five levels to practise.',
+        },
+        example: {
+          caption: {
+            ro: 'Nivelul 2, cu fusul deschis la capăt. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Level 2, with the hi-hat opened at the end. Listen, then press "You play".',
+          },
+          bpm: 104,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-rock-exersat',
+            stepsPerBar: 8,
+            rows: { hhClosed: 'xxxxxxx.', hhOpen: '.......x', snare: '..X...X.', kick: 'x..xx..x' },
+            tempo: GROOVE,
+          }),
+        },
+      },
     ],
   },
 
@@ -156,6 +197,48 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
             stepsPerBar: 12,
             // Toba mică: ghost pe pașii 2 și 8, backbeat pe 3 și 9.
             rows: { ride: 'XxxXxxXxxXxx', snare: '..oX....oX..', kick: 'x.....x.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'shuffle-ghost',
+        heading: { ro: 'Nivelul 4 · Ghost notes în shuffle', en: 'Level 4 · Ghost notes in the shuffle' },
+        body: {
+          ro: 'Mâna stângă umple ultima notă a fiecărui triolet cu un ghost note pe toba mică, sub fus. Backbeat-ul rămâne tare; ghost note-urile abia se simt și fac shuffle-ul să se rostogolească.',
+          en: 'The left hand fills the last note of each triplet with a ghost note on the snare, under the hi-hat. The backbeat stays loud; the ghost notes are barely felt and make the shuffle roll.',
+        },
+        example: {
+          caption: { ro: 'Shuffle cu ghost notes pe ultima trioletă din fiecare timp.', en: 'A shuffle with ghost notes on the last triplet of every beat.' },
+          bpm: 80,
+          exercise: demoExercise({
+            id: 'demo-stil-shuffle-ghost',
+            // Ghost pe pașii 2, 5, 8, 11 (ultima trioletă din fiecare timp); mijlocul (1, 4, 7, 10) gol.
+            stepsPerBar: 12,
+            rows: { hhClosed: 'X.xX.xX.xX.x', snare: '..oX.o..oX.o', kick: 'x.....x.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'shuffle-exersat',
+        heading: { ro: 'Exersează shuffle-ul', en: 'Practise the shuffle' },
+        body: {
+          ro: 'Cu clicul doar pe 2 și 4, ca un toboșar de blues. Greșeala tipică: tripletul pe jumătate, nici egal, nici lung-scurt, mai ales când crește tempoul. Dacă se întâmplă, coboară tempoul până nota scurtă cade din nou târziu.',
+          en: 'With the click on 2 and 4 only, like a blues drummer. The typical slip: the half-triplet, neither even nor long-short, especially as the tempo rises. If it happens, bring the tempo down until the short note falls late again.',
+        },
+        example: {
+          caption: {
+            ro: 'Nivelul 1, clicul pe 2 și 4. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Level 1, the click on 2 and 4. Listen, then press "You play".',
+          },
+          bpm: 80,
+          click: [[2, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-shuffle-exersat',
+            stepsPerBar: 12,
+            rows: { hhClosed: 'X.xX.xX.xX.x', snare: '...X.....X..', kick: 'x.....x.....' },
             tempo: TRIPLETS,
           }),
         },
@@ -228,6 +311,47 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
               snare: '....X..o.o..X..o',
               kick: 'X..x..x...x.....',
             },
+            tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'funk-linear',
+        heading: { ro: 'Nivelul 4 · Funk linear', en: 'Level 4 · Linear funk' },
+        body: {
+          ro: 'Ultimul pas: nicio piesă nu cade odată cu alta. Fusul, toba mică și toba mare își împart șaisprezecimile, una câte una. E funk-ul cel mai fluid și cel mai greu de ținut drept.',
+          en: 'The last step: no two pieces land together. Hi-hat, snare and bass drum share out the sixteenths, one at a time. It is the most fluid funk and the hardest to keep steady.',
+        },
+        example: {
+          caption: { ro: 'Un groove linear: o singură piesă pe fiecare pas.', en: 'A linear groove: a single piece on every step.' },
+          bpm: 80,
+          exercise: demoExercise({
+            id: 'demo-stil-funk-linear',
+            // Toba mare 0, 3, 7, 9, 14; toba mică 4, 12; fusul restul. Nicio coloană cu două lovituri.
+            stepsPerBar: 16,
+            rows: { hhClosed: '.xx..xx.x.xx.x.x', snare: '....X.......X...', kick: 'x..x...x.x....x.' },
+            tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'funk-exersat',
+        heading: { ro: 'Exersează funk-ul', en: 'Practise the funk' },
+        body: {
+          ro: 'Cântă nivelul 2 peste exemplu. Greșeala tipică: ghost notes prea tari, care se aud ca note și acoperă backbeat-ul. Dacă sună a rock aglomerat, nu a funk, coboară bățul aproape lipit de tobă la fiecare ghost note.',
+          en: 'Play level 2 over the example. The typical slip: ghost notes that are too loud, heard as notes, covering the backbeat. If it sounds like busy rock rather than funk, bring the stick right down to the head on every ghost note.',
+        },
+        example: {
+          caption: {
+            ro: 'Nivelul 2, ghost notes și fus pe șaisprezecimi. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Level 2, ghost notes and sixteenth hi-hat. Listen, then press "You play".',
+          },
+          bpm: 80,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-funk-exersat',
+            stepsPerBar: 16,
+            rows: { hhClosed: 'XxxxXxxxXxxxXxxx', snare: '..o.X..o..o.X...', kick: 'X..X....X..X..X.' },
             tempo: SIXTEENTHS,
           }),
         },
@@ -322,6 +446,47 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
           },
         ],
       },
+      {
+        id: 'jazz-maturi',
+        heading: { ro: 'Nivelul 4 · Balada cu mături', en: 'Level 4 · The brush ballad' },
+        body: {
+          ro: 'La baladă, bețele se schimbă pe mături. Ritmul de ride se cântă cu mătura pe toba mică, fusul cu piciorul rămâne pe 2 și 4, iar toba mare abia se atinge.',
+          en: 'In a ballad the sticks give way to brushes. The ride pattern is played with a brush on the snare, the foot hi-hat stays on 2 and 4, and the bass drum is barely touched.',
+        },
+        example: {
+          caption: { ro: 'Ritmul de ride pe mătură, fusul cu piciorul pe 2 și 4.', en: 'The ride pattern on a brush, the foot hi-hat on 2 and 4.' },
+          bpm: 72,
+          exercise: demoExercise({
+            id: 'demo-stil-jazz-maturi',
+            stepsPerBar: 12,
+            rows: { brush: 'x..X.xx..X.x', hhFoot: '...x.....x..', kick: 'o..o..o..o..' },
+            tempo: { min: 50, max: 140, suggested: 72 },
+          }),
+        },
+      },
+      {
+        id: 'jazz-exersat',
+        heading: { ro: 'Exersează ride-ul', en: 'Practise the ride' },
+        body: {
+          ro: 'Cu clicul pe 2 și 4, cântă doar ride-ul și fusul cu piciorul. Greșeala tipică: ride-ul ajunge drept, „ding, ding-ding” pe optimi egale, mai ales la tempo mare. Nota scurtă trebuie să cadă târziu, chiar înaintea timpului următor.',
+          en: 'With the click on 2 and 4, play only the ride and the foot hi-hat. The typical slip: the ride goes straight, "ding, ding-ding" on even eighths, especially at speed. The short note has to land late, right before the next beat.',
+        },
+        example: {
+          caption: {
+            ro: 'Ride-ul și fusul cu piciorul, clicul pe 2 și 4. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Ride and foot hi-hat, the click on 2 and 4. Listen, then press "You play".',
+          },
+          bpm: 112,
+          click: [[2, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-jazz-exersat',
+            stepsPerBar: 12,
+            rows: { ride: 'x..X.xx..X.x', hhFoot: '...x.....x..' },
+            tempo: { min: 60, max: 160, suggested: 112 },
+          }),
+        },
+      },
     ],
   },
 
@@ -398,6 +563,57 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
             stepsPerBar: 16,
             rows: { hhClosed: 'x.x.x.x.x.x.x.x.', kick: 'x..xx..xx..xx..x' },
             tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'clave-2-3',
+        heading: { ro: 'Nivelul 4 · Clave-ul întors: 2-3', en: 'Level 4 · The clave turned round: 2-3' },
+        body: {
+          ro: 'Clave-ul are o direcție: **3-2** (trei lovituri, apoi două) sau **2-3**. Melodia piesei o alege, iar toboșarul n-o schimbă la mijloc. Ascultă aceleași cinci lovituri, cu măsurile inversate.',
+          en: 'The clave has a direction: **3-2** (three strokes, then two) or **2-3**. The song’s melody chooses it, and the drummer does not switch it halfway. Listen to the same five strokes with the bars swapped.',
+        },
+        example: {
+          caption: { ro: 'Clave 2-3: două lovituri în prima măsură, trei în a doua.', en: '2-3 clave: two strokes in the first bar, three in the second.' },
+          bpm: 92,
+          exercise: demoExercise({
+            id: 'demo-stil-clave-2-3',
+            stepsPerBar: 8,
+            rows: { crossStick: '..x.x...' },
+            extraBars: [{ crossStick: 'x..x..x.' }],
+            tempo: GROOVE,
+          }),
+        },
+        terms: [
+          {
+            term: { ro: 'Direcția clave-ului (3-2, 2-3)', en: 'Clave direction (3-2, 2-3)' },
+            meaning: {
+              ro: 'Ordinea celor două măsuri ale clave-ului. O alege piesa și nu se schimbă pe parcurs.',
+              en: 'The order of the clave’s two bars. The song chooses it and it does not change along the way.',
+            },
+          },
+        ],
+      },
+      {
+        id: 'latin-exersat',
+        heading: { ro: 'Exersează bossa', en: 'Practise the bossa' },
+        body: {
+          ro: 'Cântă bossa peste exemplu. Greșeala tipică: toba mare prea tare, ca la rock. Bossa e moale: toba mare se simte ca o bătaie de inimă, iar cross-stick-ul ține clave-ul fără să iasă în față.',
+          en: 'Play the bossa over the example. The typical slip: a bass drum that is too loud, as in rock. Bossa is soft: the bass drum is felt like a heartbeat, and the cross-stick keeps the clave without stepping forward.',
+        },
+        example: {
+          caption: {
+            ro: 'Bossa nova pe două măsuri. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Bossa nova over two bars. Listen, then press "You play".',
+          },
+          bpm: 84,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-latin-exersat',
+            stepsPerBar: 8,
+            rows: { hhClosed: 'xxxxxxxx', crossStick: 'x..x..x.', kick: 'x..xx..x' },
+            extraBars: [{ hhClosed: 'xxxxxxxx', crossStick: '..x.x...', kick: 'x..xx..x' }],
+            tempo: GROOVE,
           }),
         },
       },
@@ -595,6 +811,77 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
           }),
         },
       },
+      {
+        id: 'clopot-4',
+        heading: { ro: 'Nivelul 4 · Și fusul cu piciorul', en: 'Level 4 · And the foot hi-hat' },
+        body: {
+          ro: 'Al patrulea membru: fusul cu piciorul stâng pe 2 și 4. Acum fiecare membru face altceva, iar clopotul rămâne același de la nivelul 1. Dacă clopotul se schimbă când intră piciorul, întoarce-te un nivel.',
+          en: 'The fourth limb: the foot hi-hat on 2 and 4 with the left foot. Now every limb does something different, and the bell is the same as at level 1. If the bell changes when the foot comes in, go back a level.',
+        },
+        example: {
+          caption: { ro: 'Clopot, toba mare pe timpi, toba mică și fusul cu piciorul pe 2 și 4.', en: 'Bell, bass drum on the beats, snare and foot hi-hat on 2 and 4.' },
+          bpm: 84,
+          exercise: demoExercise({
+            id: 'demo-stil-clopot-4',
+            stepsPerBar: 12,
+            rows: { rideBell: 'x.x.xx.x.x.x', snare: '...x.....x..', kick: 'x..x..x..x..', hhFoot: '...x.....x..' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'clopot-talanga',
+        heading: { ro: 'Nivelul 5 · Clopotul pe talangă', en: 'Level 5 · The bell on the cowbell' },
+        body: {
+          ro: 'Tiparul de clopot nu stă doar pe ride. În muzica afro-cubană se cântă de obicei pe **talangă** (cowbell), un clopot de metal prins pe set: sună mai sec și mai tăios decât clopotul ride-ului. Același tipar de șapte lovituri, același loc în măsură, doar alt metal.',
+          en: 'The bell pattern does not live only on the ride. In Afro-Cuban music it is usually played on a **cowbell**, a metal bell mounted on the kit: drier and sharper than the ride bell. The same seven-stroke pattern, the same place in the bar, just a different metal.',
+        },
+        example: {
+          caption: {
+            ro: 'Tiparul de clopot pe talangă, cu toba mare pe timpi și toba mică pe 2 și 4.',
+            en: 'The bell pattern on the cowbell, with bass drum on the beats and snare on 2 and 4.',
+          },
+          bpm: 84,
+          showKit: false,
+          exercise: demoExercise({
+            id: 'demo-stil-talanga',
+            stepsPerBar: 12,
+            rows: { cowbell: 'x.x.xx.x.x.x', snare: '...x.....x..', kick: 'x..x..x..x..' },
+            tempo: TRIPLETS,
+          }),
+        },
+        terms: [
+          {
+            term: { ro: 'Talangă (cowbell)', en: 'Cowbell' },
+            meaning: {
+              ro: 'Un clopot de metal prins pe set. Ține tiparul de clopot în latin și afro-cuban.',
+              en: 'A metal bell mounted on the kit. It carries the bell pattern in Latin and Afro-Cuban music.',
+            },
+          },
+        ],
+      },
+      {
+        id: 'afro-exersat',
+        heading: { ro: 'Exersează clopotul', en: 'Practise the bell' },
+        body: {
+          ro: 'Cântă nivelul 3 peste exemplu. Greșeala tipică: clopotul se adaptează pe nesimțite la toba mică și pierde o lovitură, fiindcă două mâini vor să cadă deodată. Spune tiparul clopotului cu voce tare în timp ce cânți.',
+          en: 'Play level 3 over the example. The typical slip: the bell quietly adapts to the snare and drops a stroke, because two hands want to land together. Say the bell pattern out loud while you play.',
+        },
+        example: {
+          caption: {
+            ro: 'Nivelul 3: clopot, toba mare, toba mică. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Level 3: bell, bass drum, snare. Listen, then press "You play".',
+          },
+          bpm: 80,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-afro-exersat',
+            stepsPerBar: 12,
+            rows: { rideBell: 'x.x.xx.x.x.x', snare: '...x.....x..', kick: 'x..x..x..x..' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
     ],
   },
 
@@ -664,6 +951,48 @@ export const stylesLessons: DrumTheoryLesson<LocalizedText>[] = [
             stepsPerBar: 16,
             rows: { hhClosed: 'xxxxxxxxxxxxxxxx', snare: '........X.......', kick: 'x......x..x.....' },
             tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'pop-4',
+        heading: { ro: 'Nivelul 4 · Fusul în rafale', en: 'Level 4 · Hi-hat bursts' },
+        body: {
+          ro: 'Peste half-time, fusul nu mai merge egal: optimi, apoi o rafală scurtă de șaisprezecimi la capătul măsurii. E semnătura hip-hop-ului și a pop-ului de azi: groove-ul rămâne lent, rafala îl face să tresară.',
+          en: 'Over the half-time, the hi-hat is no longer even: eighths, then a short burst of sixteenths at the end of the bar. It is the signature of today’s hip-hop and pop: the groove stays slow, the burst makes it twitch.',
+        },
+        example: {
+          caption: { ro: 'Half-time, fusul pe optimi cu o rafală pe timpul 4.', en: 'Half-time, the hi-hat in eighths with a burst on beat 4.' },
+          bpm: 76,
+          exercise: demoExercise({
+            id: 'demo-stil-pop-4',
+            // Fusul pe optimi (pași pari), apoi toată șaisprezecimea pe timpul 4 (12-15). Toba mică doar pe 8.
+            stepsPerBar: 16,
+            rows: { hhClosed: 'x.x.x.x.x.x.xxxx', snare: '........X.......', kick: 'x......x..x.....' },
+            tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'pop-exersat',
+        heading: { ro: 'Exersează four on the floor', en: 'Practise four on the floor' },
+        body: {
+          ro: 'Cântă four on the floor peste exemplu, cu clicul pe fiecare timp. Greșeala tipică: toba mare se clatină pe 2 și 4, unde cade odată cu toba mică, fiindcă piciorul așteaptă mâna. Toba mare trebuie să sune identic pe toți patru timpii.',
+          en: 'Play four on the floor over the example, with the click on every beat. The typical slip: the bass drum wobbles on 2 and 4, where it lands with the snare, because the foot waits for the hand. The bass drum has to sound identical on all four beats.',
+        },
+        example: {
+          caption: {
+            ro: 'Four on the floor, clicul pe fiecare timp. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Four on the floor, the click on every beat. Listen, then press "You play".',
+          },
+          bpm: 116,
+          click: [[1, 2, 3, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-stil-pop-exersat',
+            stepsPerBar: 8,
+            rows: { hhClosed: 'xxxxxxxx', snare: '..x...x.', kick: 'x.x.x.x.' },
+            tempo: GROOVE,
           }),
         },
       },

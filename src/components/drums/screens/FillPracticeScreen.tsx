@@ -54,6 +54,8 @@ const catalogue: PracticeCatalogue = {
     remăsoară, nu se citește comentariul.
   */
   showKit: true,
+  // Și pe portativ, cu comutatorul „Grilă / Portativ”.
+  staffNotation: true,
   renderNotation: (props) => <GrooveGrid {...props} />,
 }
 

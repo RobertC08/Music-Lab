@@ -23,7 +23,7 @@ export interface ManifestEntry {
 }
 
 /** Seturile pe care le încarcă `kit.ts`, în aceeași ordine. */
-const kitDirs = ['muldjord', 'drsx'].map((name) => join(__dirname, '../../assets/drums', name))
+const kitDirs = ['muldjord', 'drsx', 'vcsl'].map((name) => join(__dirname, '../../assets/drums', name))
 
 /** Toate mostrele, din toate seturile. */
 export const testManifest: { files: ManifestEntry[] } = {

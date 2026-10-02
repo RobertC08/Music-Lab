@@ -12,9 +12,11 @@ import { instrumentLessons } from './lessons/instrument'
 import { musicianLessons } from './lessons/musician'
 import { notationLessons } from './lessons/notation'
 import { stylesLessons } from './lessons/styles'
+import { drumQuizzes } from './quizzes'
 import { resolveDrumTheory } from './resolve'
 import { drumStages } from './stages'
-import type { DrumTheory, DrumTheoryLesson } from './types'
+import type { DrumQuiz } from './quiz'
+import type { DrumStageId, DrumTheory, DrumTheoryLesson } from './types'
 
 /*
   Punctul de intrare al manualului de tobe, pentru ecrane.
@@ -38,6 +40,7 @@ const source: DrumTheory<LocalizedText> = {
     ...advancedLessons,
     ...musicianLessons,
   ],
+  quizzes: drumQuizzes,
 }
 
 const byLanguage = Object.fromEntries(
@@ -58,12 +61,43 @@ export function getDrumTheoryLesson(language: string, id: string): DrumTheoryLes
   return getDrumTheory(language).lessons.find((lesson) => lesson.id === id) ?? null
 }
 
+/** Quiz-ul de după o lecție, sau `null` dacă lecția n-are încă unul. */
+export function quizForLesson(theory: DrumTheory, lessonId: string): DrumQuiz | null {
+  return theory.quizzes?.find((quiz) => quiz.lessonId === lessonId) ?? null
+}
+
+/** Quiz-ul recapitulativ al unei etape, sau `null`. */
+export function reviewForStage(theory: DrumTheory, stage: DrumStageId): DrumQuiz | null {
+  return theory.quizzes?.find((quiz) => quiz.stage === stage && !quiz.lessonId) ?? null
+}
+
 /** Sursa netradusă, pentru teste, care verifică ambele limbi deodată. */
 export const drumTheorySource = source
 
 export { drumStageIds, validateDrumTheory } from './types'
-export { theoryVocabulary } from './bars'
+export { theoryVocabulary, thinClicks } from './bars'
+export {
+  gradeMarkGrid,
+  answerRow,
+  checkedRows,
+  passed,
+  validateQuiz,
+  LESSON_QUIZ_LENGTH,
+  REVIEW_QUIZ_RANGE,
+} from './quiz'
 export type {
+  DrumQuiz,
+  QuizQuestion,
+  QuizMedia,
+  ChoiceQuestion,
+  PickPatternQuestion,
+  MarkGridQuestion,
+  GridMarks,
+  GridGrade,
+  CellResult,
+} from './quiz'
+export type {
+  ChartBar,
   DrumExample,
   DrumStage,
   DrumStageId,

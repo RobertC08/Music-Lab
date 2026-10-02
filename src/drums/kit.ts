@@ -83,6 +83,19 @@ const sampleModules: Record<SampleKey, number> = {
   'brush-ghost': require('../../assets/drums/drsx/brush-ghost.wav'),
   'brush-normal': require('../../assets/drums/drsx/brush-normal.wav'),
   'brush-accent': require('../../assets/drums/drsx/brush-accent.wav'),
+  /*
+    Din VCSL, domeniu public (CC0): cowbell, rimshot și lovitura pe ramă.
+    Pregătite de `scripts/build-vcsl-pieces.py`.
+  */
+  'cowbell-ghost': require('../../assets/drums/vcsl/cowbell-ghost.wav'),
+  'cowbell-normal': require('../../assets/drums/vcsl/cowbell-normal.wav'),
+  'cowbell-accent': require('../../assets/drums/vcsl/cowbell-accent.wav'),
+  'rimshot-ghost': require('../../assets/drums/vcsl/rimshot-ghost.wav'),
+  'rimshot-normal': require('../../assets/drums/vcsl/rimshot-normal.wav'),
+  'rimshot-accent': require('../../assets/drums/vcsl/rimshot-accent.wav'),
+  'rimClick-ghost': require('../../assets/drums/vcsl/rimClick-ghost.wav'),
+  'rimClick-normal': require('../../assets/drums/vcsl/rimClick-normal.wav'),
+  'rimClick-accent': require('../../assets/drums/vcsl/rimClick-accent.wav'),
 }
 
 /**
@@ -92,6 +105,8 @@ const sampleModules: Record<SampleKey, number> = {
 export const kitCredits: KitCredit[] = [
   require('../../assets/drums/muldjord/kit.json'),
   require('../../assets/drums/drsx/kit.json'),
+  // CC0 nu cere atribuire; apare totuși, ca lista de surse să fie completă.
+  require('../../assets/drums/vcsl/kit.json'),
 ]
 
 /** Lasă firul JS liber o clipă, ca atingerile în așteptare să fie procesate. */

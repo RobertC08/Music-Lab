@@ -249,11 +249,11 @@ export const instrumentLessons: DrumTheoryLesson<LocalizedText>[] = [
               Toba mică pe 2 și 4, nu pe 3.
 
               Prima variantă a copiat `rock-basic` din `grooves.ts`, unde toba
-              mică e pe 3, iar textul de deasupra spune „pe 2 și 4". Grila a
-              arătat contradicția pe ecran, la 375×812, imediat ce s-a deschis
-              lecția. Aici textul e cel care are dreptate: secțiunea despre toba
-              mică tocmai a predat backbeat-ul pe 2 și 4, iar exemplul final îl
-              recapitulează, nu îl contrazice.
+              mică era atunci pe 3, iar textul de deasupra spune „pe 2 și 4".
+              Grila a arătat contradicția pe ecran, la 375×812, imediat ce s-a
+              deschis lecția. Între timp și `rock-basic` a trecut pe 2 și 4, dar
+              exemplul rămâne scris aici: o lecție nu se sprijină pe un
+              exercițiu de practică care se poate schimba sub ea.
             */
             rows: {
               hhClosed: 'XxXxXxXx',

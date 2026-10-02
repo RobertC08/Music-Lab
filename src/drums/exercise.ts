@@ -33,7 +33,17 @@ export const basePieces = [
 /** O piesă a setului propriu-zis, cea pe care o vezi pe desen și o poți atinge. */
 export type BasePiece = (typeof basePieces)[number]
 
-export const kitPieces = [...basePieces, 'crossStick', 'hhFoot', 'rideBell', 'brush'] as const
+export const kitPieces = [
+  ...basePieces,
+  'crossStick',
+  'hhFoot',
+  'rideBell',
+  'brush',
+  // Din VCSL (CC0): `assets/drums/vcsl/`, `scripts/build-vcsl-pieces.py`.
+  'cowbell',
+  'rimshot',
+  'rimClick',
+] as const
 export type KitPiece = (typeof kitPieces)[number]
 
 /**
@@ -49,7 +59,13 @@ export const footPieces: readonly KitPiece[] = ['kick', 'hhFoot']
  * apare de două ori. Înainte de harta asta, o lovitură de fus deschis nu aprindea
  * nimic, deci desenul tăcea exact pe nota care face un groove de disco.
  */
-export const soundsOn: Record<KitPiece, BasePiece> = {
+/**
+ * Ce se poate aprinde pe desenul setului: piesele de bază, plus talanga, care e
+ * un instrument separat (prins pe toba mare), nu un fel de a lovi altă piesă.
+ */
+export type DrawnPiece = BasePiece | 'cowbell'
+
+export const soundsOn: Record<KitPiece, DrawnPiece> = {
   kick: 'kick',
   snare: 'snare',
   hhClosed: 'hhClosed',
@@ -63,6 +79,10 @@ export const soundsOn: Record<KitPiece, BasePiece> = {
   hhFoot: 'hhClosed',
   rideBell: 'ride',
   brush: 'snare',
+  // Talanga are locul ei pe desen, prinsă pe cercul tobei mari.
+  cowbell: 'cowbell',
+  rimshot: 'snare',
+  rimClick: 'snare',
 }
 
 /**
@@ -76,7 +96,7 @@ export type Hit = (typeof hitLevels)[number]
 /** Mâna. Contează la rudimente, unde sticking-ul E exercițiul. */
 export type Stick = 'L' | 'R'
 
-export type GrooveStyle = 'rock' | 'funk' | 'shuffle' | 'jazz' | 'latin' | 'metal'
+export type GrooveStyle = 'rock' | 'disco' | 'funk' | 'shuffle' | 'jazz' | 'latin' | 'metal'
 
 /**
  * Un ornament: notele de grație dinaintea loviturii principale.

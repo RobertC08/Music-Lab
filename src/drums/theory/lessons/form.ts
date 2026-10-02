@@ -25,6 +25,41 @@ const ROCK = { hhClosed: 'xxxxxxxx', snare: '..x...x.', kick: 'x...x...' }
 /** Prima măsură a unei fraze: crash pe „unu", fusul reia după el. */
 const ROCK_CRASH = { crash: 'x.......', hhClosed: '.xxxxxxx', snare: '..x...x.', kick: 'x...x...' }
 
+/*
+  Groove-urile de fundal, câte unul pe lecție.
+
+  Forma se predă peste un groove, iar groove-ul nu e subiectul. Dar dacă e mereu
+  același rock pe 1 și 3, elevul aude toată etapa o singură măsură și nu află
+  că fraza, fill-ul sau stop-ul arată la fel peste orice groove. Deci fiecare
+  lecție (și unele secțiuni) primesc altul, din cele învățate deja.
+*/
+type Groove = Partial<Record<'hhClosed' | 'hhOpen' | 'ride' | 'snare' | 'kick', string>>
+/** Toba mare care împinge: 1, „doi-și”, 3. */
+const PUSH: Groove = { hhClosed: 'xxxxxxxx', snare: '..x...x.', kick: 'x..xx...' }
+/** Pop 3-3-2: toba mare pe 1, „doi-și”, 4. */
+const POP: Groove = { hhClosed: 'xxxxxxxx', snare: '..x...x.', kick: 'x..x..x.' }
+/** Pe ride, cu toba mare pe 1, „doi-și”, „trei-și”. */
+const RIDE: Groove = { ride: 'xxxxxxxx', snare: '..x...x.', kick: 'x..x.x..' }
+/** Disco: fusul deschis pe „și”, toba mare pe fiecare timp. */
+const DISCO: Groove = { hhClosed: 'x.x.x.x.', hhOpen: '.x.x.x.x', snare: '..x...x.', kick: 'x.x.x.x.' }
+/** Half-time: toba mică doar pe 3. */
+const HALF: Groove = { hhClosed: 'xxxxxxxx', snare: '....x...', kick: 'x.....x.' }
+
+/** Prima măsură a frazei: crash pe „unu”, iar cinelul care ține timpul tace acolo. */
+function withCrash(groove: Groove): Groove & { crash: string } {
+  const out: Groove & { crash: string } = { ...groove, crash: 'x.......' }
+  if (groove.hhClosed) out.hhClosed = '.' + groove.hhClosed.slice(1)
+  if (groove.ride) out.ride = '.' + groove.ride.slice(1)
+  return out
+}
+
+/** Ultima măsură a frazei: fusul deschis pe ultima optime, ca semn că vine alta. */
+const openEnd = (groove: Groove): Groove => ({
+  ...groove,
+  hhClosed: (groove.hhClosed ?? 'xxxxxxxx').slice(0, 7) + '.',
+  hhOpen: '.......x',
+})
+
 export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
   {
     id: 'fraza',
@@ -91,19 +126,63 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
           exercise: demoExercise({
             id: 'demo-forma-fraza-opt',
             stepsPerBar: 8,
-            rows: ROCK_CRASH,
+            rows: withCrash(PUSH),
             extraBars: [
-              ROCK,
-              ROCK,
-              ROCK,
-              ROCK,
-              ROCK,
-              ROCK,
-              { hhClosed: 'xxxxxxx.', hhOpen: '.......x', snare: ROCK.snare, kick: ROCK.kick },
+              PUSH,
+              PUSH,
+              PUSH,
+              PUSH,
+              PUSH,
+              PUSH,
+              openEnd(PUSH),
             ],
             tempo: GROOVE,
           }),
         },
+      },
+      {
+        id: 'exerseaza-fraza',
+        heading: { ro: 'Exersează: cântă fraza', en: 'Practise: play the phrase' },
+        body: {
+          ro: 'Cântă o frază întreagă: crash pe „unu” în prima măsură, groove în următoarele, iar la capătul celei de-a patra deschizi fusul pe ultima optime, ca semn că vine o frază nouă. Numără primul timp al fiecărei măsuri cu numărul ei: unu, doi, trei, patru.',
+          en: 'Play a whole phrase: crash on one in the first bar, groove in the next ones, and at the end of the fourth open the hi-hat on the last eighth, as a sign a new phrase is coming. Count the first beat of each bar with its number: one, two, three, four.',
+        },
+        example: {
+          caption: {
+            ro: 'Crash la început, fusul deschis la capătul măsurii a patra. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'A crash at the start, the hi-hat opened at the end of bar four. Listen, then press "You play".',
+          },
+          bpm: 96,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-forma-fraza-exersat',
+            stepsPerBar: 8,
+            rows: withCrash(POP),
+            extraBars: [
+              POP,
+              POP,
+              openEnd(POP),
+            ],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'blues-de-doisprezece',
+        heading: { ro: 'Douăsprezece măsuri: blues-ul', en: 'Twelve bars: the blues' },
+        body: {
+          ro: 'Nu toate frazele sunt de patru sau opt. **Blues-ul** are douăsprezece măsuri: trei rânduri de câte patru. Toboșarul marchează începutul cu crash, pune un fill mic la capătul rândurilor unu și doi și un fill mai mare la capătul celui de-al treilea, când forma se ia de la capăt.',
+          en: 'Not every phrase is four or eight bars. The **blues** has twelve: three lines of four. The drummer marks the start with a crash, puts a small fill at the end of the first and second lines and a bigger one at the end of the third, when the form starts over.',
+        },
+        terms: [
+          {
+            term: { ro: 'Blues de 12 măsuri', en: 'Twelve-bar blues' },
+            meaning: {
+              ro: 'Forma de blues: trei rânduri de câte patru măsuri, reluate de la capăt.',
+              en: 'The blues form: three lines of four bars, repeated from the top.',
+            },
+          },
+        ],
       },
     ],
   },
@@ -134,10 +213,10 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
           exercise: demoExercise({
             id: 'demo-forma-fill',
             stepsPerBar: 8,
-            rows: ROCK_CRASH,
+            rows: withCrash(PUSH),
             extraBars: [
-              ROCK,
-              ROCK,
+              PUSH,
+              PUSH,
               // Fill-ul pe optimi: toba mică pe timpii 1-2, tomul 1 pe 3, cazanul pe 4.
               { snare: 'xxxx....', tom: '....xx..', floor: '......xx', kick: 'x.......' },
             ],
@@ -181,6 +260,53 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
             rows: ROCK_CRASH,
             // Pașii 4-7 (timpii 3-4): toba mică, tomul 1, cazanul.
             extraBars: [{ hhClosed: 'xxxx....', snare: '..x.xx..', tom: '......x.', floor: '.......x', kick: 'x.......' }],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'fill-pe-un-timp',
+        heading: { ro: 'Un singur timp', en: 'A single beat' },
+        body: {
+          ro: 'Cel mai mic fill ține un singur timp: două lovituri pe tomuri, pe „patru” și pe „patru-și”, apoi crash. E primul fill pe care merită să-l stăpânești, fiindcă merge oriunde și nu te poate scoate din timp.',
+          en: 'The smallest fill lasts one beat: two strokes on the toms, on four and the "and" of four, then a crash. It is the first fill worth owning, because it fits anywhere and cannot throw you off time.',
+        },
+        example: {
+          caption: {
+            ro: 'Trei măsuri de groove, a patra cu fill doar pe timpul 4.',
+            en: 'Three bars of groove, the fourth with a fill on beat 4 only.',
+          },
+          bpm: 92,
+          exercise: demoExercise({
+            id: 'demo-forma-fill-un-timp',
+            stepsPerBar: 8,
+            rows: withCrash(POP),
+            // Măsura 4: tomul 1 pe pasul 6, cazanul pe 7.
+            extraBars: [POP, POP, { hhClosed: 'xxxxxx..', snare: '..x.....', tom: '......x.', floor: '.......x', kick: 'x...x...' }],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-fill',
+        heading: { ro: 'Exersează: fill-ul la timp', en: 'Practise: the fill on time' },
+        body: {
+          ro: 'Cântă fraza cu fill-ul pe ultimii doi timpi, cu clicul pe fiecare timp. Spune timpii cu voce tare în fill: „trei-și-patru-și”. Dacă crash-ul tău cade înaintea clicului de pe „unu”, ai grăbit fill-ul; dacă după el, l-ai întins.',
+          en: 'Play the phrase with the fill on the last two beats, with the click on every beat. Say the beats out loud during the fill: "three-and-four-and". If your crash lands before the click on one, you rushed the fill; if after it, you stretched it.',
+        },
+        example: {
+          caption: {
+            ro: 'Trei măsuri de groove, fill pe timpii 3-4, crash la întoarcere. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Three bars of groove, a fill on beats 3-4, crash on the way back. Listen, then press "You play".',
+          },
+          bpm: 88,
+          click: [[1, 2, 3, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-forma-fill-exersat',
+            stepsPerBar: 8,
+            rows: withCrash(RIDE),
+            extraBars: [RIDE, RIDE, { hhClosed: 'xxxx....', snare: '..x.xx..', tom: '......x.', floor: '.......x', kick: 'x.......' }],
             tempo: GROOVE,
           }),
         },
@@ -292,6 +418,31 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
           },
         ],
       },
+      {
+        id: 'cresterea',
+        heading: { ro: 'Drumul spre refren', en: 'The road into the chorus' },
+        body: {
+          ro: 'Între strofă și refren, toba poate construi tensiune într-o singură măsură: toba mică pe fiecare optime, din ce în ce mai tare, cu toba mare pe fiecare timp. Crash-ul de pe „unu” al refrenului descarcă tot ce s-a strâns.',
+          en: 'Between verse and chorus, the drums can build tension in a single bar: the snare on every eighth, louder and louder, with the bass drum on every beat. The crash on the chorus’s one releases everything that built up.',
+        },
+        example: {
+          caption: {
+            ro: 'Strofa, o măsură de creștere pe toba mică, apoi refrenul cu crash.',
+            en: 'The verse, a bar of build-up on the snare, then the chorus with a crash.',
+          },
+          bpm: 92,
+          exercise: demoExercise({
+            id: 'demo-forma-crestere',
+            stepsPerBar: 8,
+            rows: { hhClosed: ROCK.hhClosed, snare: ROCK.snare, kick: 'x.......' },
+            extraBars: [
+              { snare: 'ooxxxxXX', kick: 'x.x.x.x.' },
+              { crash: 'x.......', ride: '.xxxxxxx', snare: ROCK.snare, kick: 'x..xx...' },
+            ],
+            tempo: GROOVE,
+          }),
+        },
+      },
     ],
   },
 
@@ -320,7 +471,7 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
           exercise: demoExercise({
             id: 'demo-forma-stop',
             stepsPerBar: 8,
-            rows: ROCK,
+            rows: POP,
             extraBars: [{ crash: 'x.......', snare: 'x.......', kick: 'x.......' }],
             tempo: GROOVE,
           }),
@@ -360,7 +511,57 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
             id: 'demo-forma-numaratoare',
             stepsPerBar: 8,
             rows: { hhClosed: 'x.x.x.x.' },
-            extraBars: [ROCK_CRASH],
+            extraBars: [withCrash(DISCO)],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-stop',
+        heading: { ro: 'Exersează: numără liniștea', en: 'Practise: count the silence' },
+        body: {
+          ro: 'Groove, stop pe „unu”, o măsură de liniște, apoi intrarea cu crash. Clicul merge mai departe prin liniște: numără-l cu voce tare. Greșeala tipică e intrarea grăbită, fiindcă liniștea pare mai lungă decât e.',
+          en: 'Groove, a stop on one, a bar of silence, then the entry with a crash. The click carries on through the silence: count it out loud. The typical slip is a rushed entry, because silence feels longer than it is.',
+        },
+        example: {
+          caption: {
+            ro: 'O măsură de groove, stop, apoi intrarea pe „unu”. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'One bar of groove, a stop, then the entry on one. Listen, then press "You play".',
+          },
+          bpm: 92,
+          click: [[1, 2, 3, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-forma-stop-exersat',
+            stepsPerBar: 8,
+            rows: PUSH,
+            extraBars: [{ crash: 'x.......', snare: 'x.......', kick: 'x.......' }, withCrash(PUSH)],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'break-de-tobe',
+        heading: { ro: 'Când break-ul e al tău', en: 'When the break is yours' },
+        body: {
+          ro: 'Într-un break de tobe, trupa tace și tu cânți singur, de obicei o măsură sau două. Nu e un solo liber: are lungimea măsurilor pe care le înlocuiește, iar trupa reintră pe „unu” după el, pe încrederea că l-ai numărat.',
+          en: 'In a drum break the band stops and you play alone, usually for a bar or two. It is not a free solo: it has the length of the bars it replaces, and the band comes back in on one after it, trusting that you counted.',
+        },
+        example: {
+          caption: {
+            ro: 'Două măsuri de groove, o măsură de break pe tomuri, apoi crash și groove.',
+            en: 'Two bars of groove, one bar of break on the toms, then a crash and the groove.',
+          },
+          bpm: 92,
+          exercise: demoExercise({
+            id: 'demo-forma-break',
+            stepsPerBar: 8,
+            rows: HALF,
+            extraBars: [
+              HALF,
+              { snare: 'x.x.....', tom: '.x..xx..', floor: '...x..xx', kick: 'x...x...' },
+              withCrash(HALF),
+            ],
             tempo: GROOVE,
           }),
         },
@@ -421,7 +622,7 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
             stepsPerBar: 8,
             // Pașii 6 și 7 = „patru” și „patru-și”.
             rows: { snare: '......xx' },
-            extraBars: [ROCK_CRASH],
+            extraBars: [withCrash(RIDE)],
             tempo: GROOVE,
           }),
         },
@@ -434,6 +635,52 @@ export const formLessons: DrumTheoryLesson<LocalizedText>[] = [
             },
           },
         ],
+      },
+      {
+        id: 'cand-toba-mare-lipseste',
+        heading: { ro: 'Când toba mare lipsește de pe „unu”', en: 'When the bass drum skips one' },
+        body: {
+          ro: 'În funk și în reggae, toba mare nu cade mereu pe „unu”. Atunci nu te baza pe ea: caută backbeat-ul pe 2 și 4 și accentul fusului pe timpi. „Unu” e acolo chiar dacă nimic nu-l lovește tare.',
+          en: 'In funk and reggae the bass drum does not always land on one. Then do not rely on it: look for the backbeat on 2 and 4 and the hi-hat accent on the beats. One is there even when nothing hits it hard.',
+        },
+        example: {
+          caption: {
+            ro: 'Toba mare doar pe contratimpi; „unu”-l îl ține accentul fusului.',
+            en: 'The bass drum only on off-beats; the hi-hat accent holds beat one.',
+          },
+          bpm: 88,
+          exercise: demoExercise({
+            id: 'demo-forma-fara-unu',
+            // Toba mare pe pașii 1, 5, 7: „unu-și”, „trei-și”, „patru-și”.
+            stepsPerBar: 8,
+            rows: { hhClosed: 'XxXxXxXx', snare: ROCK.snare, kick: '.x...x.x' },
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-unu',
+        heading: { ro: 'Exersează: clicul doar pe „unu”', en: 'Practise: the click on one only' },
+        body: {
+          ro: 'Cu clicul doar pe „unu”, restul timpilor îi ții tu. E testul cel mai simplu că știi unde ești: dacă după patru măsuri lovitura ta de pe „unu” nu se suprapune cu clicul, te-ai mutat pe drum.',
+          en: 'With the click on one only, you hold the other beats yourself. It is the simplest test that you know where you are: if after four bars your stroke on one does not land with the click, you drifted on the way.',
+        },
+        example: {
+          caption: {
+            ro: 'Clicul doar pe „unu”, patru măsuri de groove. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'The click on one only, four bars of groove. Listen, then press "You play".',
+          },
+          bpm: 84,
+          click: [[1]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-forma-unu-exersat',
+            stepsPerBar: 8,
+            rows: withCrash(POP),
+            extraBars: [POP, POP, POP],
+            tempo: GROOVE,
+          }),
+        },
       },
     ],
   },

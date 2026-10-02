@@ -219,6 +219,81 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
           }),
         },
       },
+      {
+        id: 'ostinato-saisprezecimi',
+        heading: { ro: 'Un ostinato mai des', en: 'A busier ostinato' },
+        body: {
+          ro: 'Ostinato-ul poate fi și pe șaisprezecimi, cu o singură mână. E mai greu de ținut: patru lovituri pe timp, iar toba mare se strecoară acum între ele, nu doar lângă ele. Regula rămâne: fusul nu se clatină, orice ar face piciorul.',
+          en: 'The ostinato can also be in sixteenths, with one hand. It is harder to hold: four strokes per beat, and the bass drum now slips in between them, not only next to them. The rule stays: the hi-hat does not waver, whatever the foot does.',
+        },
+        example: {
+          caption: {
+            ro: 'Fusul pe șaisprezecimi în ambele măsuri; în a doua, toba mare cade și pe „doi-și” și „trei-și”.',
+            en: 'Hi-hat in sixteenths in both bars; in the second, the bass drum also lands on the "and" of 2 and 3.',
+          },
+          bpm: 72,
+          exercise: demoExercise({
+            id: 'demo-groove-ostinato-16',
+            // 16 pași. Măsura 2: toba mare 0, 6, 8, 10.
+            stepsPerBar: 16,
+            rows: { hhClosed: 'xxxxxxxxxxxxxxxx', snare: '....x.......x...', kick: 'x.......x.......' },
+            extraBars: [
+              { hhClosed: 'xxxxxxxxxxxxxxxx', snare: '....x.......x...', kick: 'x.....x.x.x.....' },
+            ],
+            tempo: SIXTEENTHS,
+          }),
+        },
+      },
+      {
+        id: 'ostinato-pe-ride',
+        heading: { ro: 'Ostinato-ul pe ride', en: 'The ostinato on the ride' },
+        body: {
+          ro: 'Ostinato-ul nu e legat de fus. Mutat pe ride, aceeași mână ține același flux, doar culoarea se schimbă: mai deschis, mai plin. Mâna ta nu trebuie să afle că s-a mutat; doar brațul.',
+          en: 'The ostinato is not tied to the hi-hat. Moved to the ride, the same hand keeps the same stream, only the colour changes: more open, fuller. Your hand does not need to know it moved; only your arm does.',
+        },
+        example: {
+          caption: {
+            ro: 'Ride pe optimi; toba mare se schimbă în a doua măsură, ride-ul nu.',
+            en: 'Ride in eighths; the bass drum changes in the second bar, the ride does not.',
+          },
+          bpm: 84,
+          exercise: demoExercise({
+            id: 'demo-groove-ostinato-ride',
+            stepsPerBar: 8,
+            rows: { ride: 'xxxxxxxx', snare: ROCK.snare, kick: ROCK.kick },
+            extraBars: [{ ride: 'xxxxxxxx', snare: ROCK.snare, kick: 'x..xx..x' }],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-ostinato',
+        heading: { ro: 'Exersează: fusul întâi', en: 'Practise: the hi-hat first' },
+        body: {
+          ro: 'Pornește cu fusul singur, până merge fără să te gândești. Apoi adaugă toba mică pe 2 și 4. Abia apoi toba mare, câte o lovitură nouă pe măsură, ca în exemplu. Dacă fusul se oprește când intră o lovitură nouă, întoarce-te la măsura de dinainte.',
+          en: 'Start with the hi-hat alone, until it runs without thinking. Then add the snare on 2 and 4. Only then the bass drum, one new stroke per bar, as in the example. If the hi-hat stops when a new stroke comes in, go back to the bar before.',
+        },
+        example: {
+          caption: {
+            ro: 'Toba mare pe 1 și 3, apoi se adaugă „doi-și”, „trei-și”, „patru-și”, câte una pe măsură. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Bass drum on 1 and 3, then the "and" of 2, 3 and 4 come in, one per bar. Listen, then press "You play".',
+          },
+          bpm: 72,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-groove-ostinato-trepte',
+            // Toba mare: 0,4 · 0,3,4 · 0,3,4,5 · 0,3,4,5,7.
+            stepsPerBar: 8,
+            rows: ROCK,
+            extraBars: [
+              { hhClosed: ROCK.hhClosed, snare: ROCK.snare, kick: 'x..xx...' },
+              { hhClosed: ROCK.hhClosed, snare: ROCK.snare, kick: 'x..xxx..' },
+              { hhClosed: ROCK.hhClosed, snare: ROCK.snare, kick: 'x..xxx.x' },
+            ],
+            tempo: GROOVE,
+          }),
+        },
+      },
     ],
   },
 
@@ -317,6 +392,36 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
           },
         ],
       },
+      {
+        id: 'feel-de-triolete',
+        heading: { ro: 'Feel de triolete', en: 'A triplet feel' },
+        body: {
+          ro: 'Aceeași tobă mare, aceeași tobă mică, dar fusul bate trei pe timp: grila de dedesubt e acum ternară. Groove-ul nu e mai rapid, se leagănă. E pasul spre shuffle, din lecția următoare.',
+          en: 'The same bass drum, the same snare, but the hi-hat plays three per beat: the grid underneath is now in threes. The groove is not faster, it sways. It is the step towards the shuffle, in the next lesson.',
+        },
+        example: {
+          caption: {
+            ro: 'Fusul pe triolete, toba mare pe 1 și 3, toba mică pe 2 și 4.',
+            en: 'Hi-hat on triplets, bass drum on 1 and 3, snare on 2 and 4.',
+          },
+          bpm: 72,
+          exercise: demoExercise({
+            id: 'demo-groove-feel-triolete',
+            // 12 pași, 3 pe timp. Toba mică 3, 9 (timpii 2 și 4); toba mare 0, 6.
+            stepsPerBar: 12,
+            rows: { hhClosed: 'xxxxxxxxxxxx', snare: '...x.....x..', kick: 'x.....x.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'numara-feel-ul',
+        heading: { ro: 'Numără feel-ul cu voce tare', en: 'Count the feel out loud' },
+        body: {
+          ro: 'Ca să știi pe ce feel ești, spune grila cu voce tare în timp ce asculți: „unu-și” la optimi, „unu-e-și-a” la șaisprezecimi, „unu-tri-o-let” la triolete. Feel-ul e cel pe care cade fiecare lovitură fără să te împiedici. Greșeala tipică: o singură notă pe „a” într-un groove de optimi, cântată ca și cum ar fi pe „și”, adică prea devreme.',
+          en: 'To know which feel you are in, say the grid out loud while you listen: "one-and" for eighths, "one-e-and-a" for sixteenths, "one-trip-let" for triplets. The feel is the one every stroke lands on without tripping. The typical slip: a single note on the "a" in an eighth-note groove, played as if it were on the "and", that is, too early.',
+        },
+      },
     ],
   },
 
@@ -366,6 +471,51 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
               snare '...x.....x..' = pașii 3 și 9 = timpii 2 și 4
               kick  'x.....x.....' = pașii 0 și 6 = timpii 1 și 3
             */
+            stepsPerBar: 12,
+            rows: { hhClosed: 'x.xx.xx.xx.x', snare: '...x.....x..', kick: 'x.....x.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'shuffle-cu-toba-mare',
+        heading: { ro: 'Shuffle cu toba mare', en: 'A shuffle with the bass drum' },
+        body: {
+          ro: 'Și toba mare poate intra în legănare: pe ultima notă a trioletului din timpul 2, chiar înainte de 3. Lovitura asta e cea care dă shuffle-ului de blues mersul lui: dacă o cânți pe o optime dreaptă, groove-ul se rupe în două.',
+          en: 'The bass drum can join the swing too: on the last note of the triplet on beat 2, just before 3. That stroke is what gives the blues shuffle its walk: played as a straight eighth, the groove breaks in two.',
+        },
+        example: {
+          caption: {
+            ro: 'Shuffle cu toba mare pe 1, pe ultima trioletă din 2 și pe 3.',
+            en: 'A shuffle with the bass drum on 1, the last triplet of 2 and on 3.',
+          },
+          bpm: 80,
+          exercise: demoExercise({
+            id: 'demo-groove-shuffle-mare',
+            // 12 pași: toba mare 0, 5, 6. Mijlocul trioletelor (1, 4, 7, 10) gol.
+            stepsPerBar: 12,
+            rows: { hhClosed: 'x.xx.xx.xx.x', snare: '...x.....x..', kick: 'x....xx.....' },
+            tempo: TRIPLETS,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-shuffle',
+        heading: { ro: 'Exersează cu clicul pe 2 și 4', en: 'Practise with the click on 2 and 4' },
+        body: {
+          ro: 'Clicul pe 2 și 4 e felul în care exersează toboșarii de jazz și de blues: el ține backbeat-ul, tu ții legănarea. Cântă peste el până când toba mică ta îl acoperă și fiecare „și” cade lung-scurt, nu egal.',
+          en: 'A click on 2 and 4 is how jazz and blues drummers practise: it holds the backbeat, you hold the swing. Play over it until your snare covers it and every "and" falls long-short, not even.',
+        },
+        example: {
+          caption: {
+            ro: 'Shuffle cu clicul doar pe 2 și 4. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'A shuffle with the click on 2 and 4 only. Listen, then press "You play".',
+          },
+          bpm: 76,
+          click: [[2, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-groove-shuffle-exersat',
             stepsPerBar: 12,
             rows: { hhClosed: 'x.xx.xx.xx.x', snare: '...x.....x..', kick: 'x.....x.....' },
             tempo: TRIPLETS,
@@ -428,8 +578,8 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
         id: 'fus-deschis',
         heading: { ro: 'Fusul deschis pe „și”', en: 'Open hi-hat on the "and"' },
         body: {
-          ro: 'Fusul închis pe timpi, deschis pe fiecare „și”, cu toba mare pe toți cei patru timpi. Rolurile rămân aceleași, dar groove-ul capătă suflu: e sunetul de disco.',
-          en: 'Closed hi-hat on the beats, open on every "and", with the bass drum on all four beats. The roles stay the same, but the groove gets a lift: that is the disco sound.',
+          ro: 'Fusul închis pe timpi, deschis pe fiecare „și”, cu toba mare pe toți cei patru timpi. Rolurile rămân aceleași, dar groove-ul capătă suflu: e sunetul de disco. Fusul de pe „și” se mai numește **off-beat**, fiindcă sună între timpi, nu pe ei. În Groove-uri îl găsești pe patru niveluri.',
+          en: 'Closed hi-hat on the beats, open on every "and", with the bass drum on all four beats. The roles stay the same, but the groove gets a lift: that is the disco sound. A hi-hat on the "and" is called an **off-beat**, because it sounds between the beats, not on them. Grooves has it in four levels.',
         },
         example: {
           caption: {
@@ -445,6 +595,15 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
             tempo: GROOVE,
           }),
         },
+        terms: [
+          {
+            term: { ro: 'Off-beat', en: 'Off-beat' },
+            meaning: {
+              ro: 'Lovitura de pe „și”, între timpi. La disco și dance o ține fusul, deschis sau închis, peste toba mare de pe fiecare timp.',
+              en: 'The stroke on the "and", between the beats. In disco and dance music the hi-hat plays it, open or closed, over a bass drum on every beat.',
+            },
+          },
+        ],
       },
       {
         id: 'timpul-pe-cazan',
@@ -461,6 +620,59 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
             id: 'demo-groove-cazan',
             stepsPerBar: 8,
             rows: { floor: 'xxxxxxxx', snare: ROCK.snare, kick: ROCK.kick },
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'clopotul',
+        heading: { ro: 'Clopotul ride-ului', en: 'The ride bell' },
+        body: {
+          ro: 'Ride-ul are două sunete: fața, deschisă și caldă, și **clopotul** din mijloc, ascuțit, care taie prin orice. Pe pătrimi, clopotul ține timpul ca un metronom pe care îl aude toată trupa: îl găsești în refrenele tari de rock și de latin.',
+          en: 'The ride has two sounds: the face, open and warm, and the **bell** in the middle, sharp, cutting through anything. On quarter notes, the bell keeps time like a metronome the whole band can hear: you find it in loud rock and Latin choruses.',
+        },
+        example: {
+          caption: {
+            ro: 'Clopotul pe pătrimi, toba mare și toba mică ca în groove-ul de rock.',
+            en: 'The bell on quarter notes, bass drum and snare as in the rock groove.',
+          },
+          bpm: 96,
+          showKit: true,
+          exercise: demoExercise({
+            id: 'demo-groove-clopot',
+            stepsPerBar: 8,
+            rows: { rideBell: 'x.x.x.x.', snare: ROCK.snare, kick: 'x..xx...' },
+            tempo: GROOVE,
+          }),
+        },
+        terms: [
+          {
+            term: { ro: 'Clopotul ride-ului (bell)', en: 'Ride bell' },
+            meaning: {
+              ro: 'Cupola din mijlocul ride-ului. Lovită, sună ascuțit și se aude prin toată trupa.',
+              en: 'The dome in the middle of the ride. Struck, it sounds sharp and carries through the whole band.',
+            },
+          },
+        ],
+      },
+      {
+        id: 'backbeat-pe-cross-stick',
+        heading: { ro: 'Și backbeat-ul se orchestrează', en: 'The backbeat can be orchestrated too' },
+        body: {
+          ro: 'Nu doar timpul se mută. Backbeat-ul trece de pe toba mică pe cross-stick la strofa unei balade, și înapoi pe toba mică la refren. Rolul rămâne pe 2 și 4; se schimbă doar cât de tare și cât de cald sună.',
+          en: 'It is not only the time that moves. The backbeat goes from the snare to the cross-stick in a ballad verse, and back to the snare in the chorus. The role stays on 2 and 4; only how loud and warm it sounds changes.',
+        },
+        example: {
+          caption: {
+            ro: 'O măsură cu cross-stick pe 2 și 4, apoi una cu toba mică.',
+            en: 'One bar with cross-stick on 2 and 4, then one with the snare.',
+          },
+          bpm: 76,
+          exercise: demoExercise({
+            id: 'demo-groove-cross-backbeat',
+            stepsPerBar: 8,
+            rows: { hhClosed: ROCK.hhClosed, crossStick: '..x...x.', kick: ROCK.kick },
+            extraBars: [ROCK],
             tempo: GROOVE,
           }),
         },
@@ -556,6 +768,34 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
           en: 'When the volume goes up, the tempo tends to run. Practise the same groove once soft and once loud, against the same metronome, to keep the two apart.',
         },
       },
+      {
+        id: 'incet-si-tare',
+        heading: { ro: 'Încearcă: încet, apoi tare', en: 'Try it: soft, then loud' },
+        body: {
+          ro: 'Două măsuri încet, cu fusul abia atins, două tare, cu fusul accentuat pe timpi. Clicul nu se schimbă. Dacă la măsurile tari ajungi înaintea clicului, ai grăbit: volumul ți-a tras tempoul după el.',
+          en: 'Two bars soft, with the hi-hat barely touched, two loud, with the hi-hat accented on the beats. The click does not change. If you get ahead of the click in the loud bars, you rushed: the volume pulled your tempo along.',
+        },
+        example: {
+          caption: {
+            ro: 'Două măsuri încet, două tare, același tempo. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Two bars soft, two loud, the same tempo. Listen, then press "You play".',
+          },
+          bpm: 84,
+          click: [[1, 2, 3, 4]],
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-groove-incet-tare',
+            stepsPerBar: 8,
+            rows: { hhClosed: 'oooooooo', snare: '..x...x.', kick: 'x...x...' },
+            extraBars: [
+              { hhClosed: 'oooooooo', snare: '..x...x.', kick: 'x...x...' },
+              { hhClosed: 'XxXxXxXx', snare: '..X...X.', kick: 'X...X...' },
+              { hhClosed: 'XxXxXxXx', snare: '..X...X.', kick: 'X...X...' },
+            ],
+            tempo: GROOVE,
+          }),
+        },
+      },
     ],
   },
 
@@ -614,6 +854,51 @@ export const grooveLessons: DrumTheoryLesson<LocalizedText>[] = [
               // Toba mică și pe „patru-și” (pasul 7), fusul deschis tot acolo.
               { hhClosed: 'xxxxxxx.', hhOpen: '.......x', snare: '..x...xx', kick: ROCK.kick },
             ],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'variatie-pe-toba-mica',
+        heading: { ro: 'Variația pe toba mică', en: 'A snare variation' },
+        body: {
+          ro: 'Variația poate fi și pe toba mică: o lovitură în plus pe „patru-și”, chiar înaintea lui „unu”. Backbeat-ul de pe 2 și 4 rămâne; nota nouă doar împinge spre măsura următoare. Toba mare nu se mișcă, ca să se audă unde e schimbarea.',
+          en: 'The variation can be on the snare too: one extra stroke on the "and" of 4, right before one. The backbeat on 2 and 4 stays; the new note only pushes towards the next bar. The bass drum does not move, so you can hear where the change is.',
+        },
+        example: {
+          caption: {
+            ro: 'A doua măsură adaugă toba mică pe „patru-și”.',
+            en: 'The second bar adds the snare on the "and" of 4.',
+          },
+          bpm: 84,
+          exercise: demoExercise({
+            id: 'demo-groove-variatie-mica',
+            stepsPerBar: 8,
+            rows: ROCK,
+            extraBars: [{ hhClosed: ROCK.hhClosed, snare: '..x...xx', kick: ROCK.kick }],
+            tempo: GROOVE,
+          }),
+        },
+      },
+      {
+        id: 'exerseaza-trei-plus-unu',
+        heading: { ro: 'Exersează: trei plus unu', en: 'Practise: three plus one' },
+        body: {
+          ro: 'Cea mai folosită formă: trei măsuri de groove, a patra cu variația. Numără măsurile, nu doar timpii: „unu-doi-trei-patru, doi-doi-trei-patru…”. Greșeala tipică e variația mutată pe a treia măsură, fiindcă ai pierdut numărătoarea măsurilor.',
+          en: 'The most common shape: three bars of groove, the fourth with the variation. Count the bars, not only the beats: "one-two-three-four, two-two-three-four…". The typical slip is the variation drifting to the third bar, because you lost count of the bars.',
+        },
+        example: {
+          caption: {
+            ro: 'Trei măsuri de groove, a patra cu toba mare mutată și toba mică pe „patru-și”. Ascultă, apoi apasă „Cânți tu”.',
+            en: 'Three bars of groove, the fourth with the bass drum moved and the snare on the "and" of 4. Listen, then press "You play".',
+          },
+          bpm: 84,
+          playAlong: true,
+          exercise: demoExercise({
+            id: 'demo-groove-trei-plus-unu',
+            stepsPerBar: 8,
+            rows: ROCK,
+            extraBars: [ROCK, ROCK, { hhClosed: ROCK.hhClosed, snare: '..x...xx', kick: 'x..xx...' }],
             tempo: GROOVE,
           }),
         },

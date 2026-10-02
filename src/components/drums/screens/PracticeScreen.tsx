@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
+import { haptic } from '@/lib/haptics/game-haptics'
 import { ArrowLeft, ChevronRight, LockKeyhole, Minus, Plus, Square, Play } from 'lucide-react-native'
 import { ConditionalKeepAwake } from '@/components/system/conditional-keep-awake'
 import { publicColors } from '@/components/public-practice/ui'
@@ -9,11 +10,13 @@ import { missingFor, unlockedIn } from '@/lib/drums/catalogue'
 import { MAX_BPM, type DrumExercise } from '@/lib/drums/exercise'
 import { kitIfLoaded, loadKit } from '@/lib/drums/kit'
 import { steadyMode, type PracticeMode } from '@/lib/drums/modes'
-import { nextExerciseChange, planDrumMedley } from '@/lib/drums/plan'
+import { nextExerciseChange, planDrumMedley, type PlannedBar } from '@/lib/drums/plan'
 import { buildSessionTrack } from '@/lib/drums/session-track'
-import { piecesSoundingAt } from '@/lib/drums/sounding'
+import { stepCursor, type Playhead, type StepCursor } from '@/lib/drums/playhead'
+import { usePlayheadValue } from '@/lib/drums/use-playhead'
+import { LiveKitDrawing, WithCursor } from '@/components/drums/live'
+import { DrumStaff } from '@/components/drums/theory/DrumStaff'
 import { usePracticeSession } from '@/lib/drums/use-practice-session'
-import { KitDrawing } from '@/components/drums/theory/KitDiagram'
 import { useGuestStore } from '@/lib/guest/store'
 
 /*
@@ -62,6 +65,12 @@ export interface PracticeCatalogue {
   exercises: readonly DrumExercise[]
   /** Cheile de text ale unui exercițiu. Textul nu stă în date. */
   textOf: (id: string) => { titleKey: string; howToKey: string }
+  /**
+   * Cheia titlului de grup sub care stă exercițiul în listă (la groove-uri,
+   * stilul). Lista e deja ordonată pe grupuri; se scrie un titlu de fiecare dată
+   * când grupul se schimbă. Lipsă = o listă fără titluri.
+   */
+  groupOf?: (exercise: DrumExercise) => string | null
   /** Modurile de sunet oferite. Primul e cel implicit. */
   soundModes?: SoundMode[]
   /** Modurile de sesiune oferite. Primul e cel implicit; lipsă = doar cel obișnuit. */
@@ -76,6 +85,12 @@ export interface PracticeCatalogue {
    * ar lua ecran de care rândul de mâini chiar are nevoie.
    */
   showKit?: boolean
+  /**
+   * Se poate citi și pe portativ, nu doar pe grilă: apare comutatorul „Grilă /
+   * Portativ” deasupra notației: groove-uri, fill-uri, fill-uri avansate. La
+   * rudimente nu, acolo notația e rândul de mâini.
+   */
+  staffNotation?: boolean
   /** Notația: rândul de mâini la rudimente, grila de piese la groove-uri. */
   renderNotation: (props: {
     exercise: DrumExercise
@@ -83,6 +98,8 @@ export interface PracticeCatalogue {
     activeStep: number
     /** Fals în timpul sesiunii: explicațiile de sub notație nu mai au cui folosi. */
     showHint: boolean
+    /** Pasul care se aude, ca cursor: notația își aprinde singură celulele. */
+    cursor?: StepCursor
   }) => ReactNode
 }
 
@@ -253,17 +270,34 @@ export function PracticeScreen({
               {t(catalogue.pickKey)}
             </Text>
             <View style={{ gap: 8 }}>
-              {catalogue.exercises.map((exercise) => (
-                <ExerciseCard
-                  key={exercise.id}
-                  catalogue={catalogue}
-                  exercise={exercise}
-                  unlocked={open.has(exercise.id)}
-                  bestTempo={progress?.exercises?.[exercise.id]?.bestTempo ?? 0}
-                  completedIds={completed}
-                  onPress={() => setSelectedId(exercise.id)}
-                />
-              ))}
+              {catalogue.exercises.map((exercise, index) => {
+                const group = catalogue.groupOf?.(exercise) ?? null
+                const previous = index > 0 ? catalogue.groupOf?.(catalogue.exercises[index - 1]!) : null
+                return (
+                  <View key={exercise.id} style={{ gap: 8 }}>
+                    {group && group !== previous ? (
+                      <Text
+                        style={{
+                          marginTop: index === 0 ? 0 : 10,
+                          fontSize: 16,
+                          fontWeight: '800',
+                          color: publicColors.ink,
+                        }}
+                      >
+                        {t(group)}
+                      </Text>
+                    ) : null}
+                    <ExerciseCard
+                      catalogue={catalogue}
+                      exercise={exercise}
+                      unlocked={open.has(exercise.id)}
+                      bestTempo={progress?.exercises?.[exercise.id]?.bestTempo ?? 0}
+                      completedIds={completed}
+                      onPress={() => setSelectedId(exercise.id)}
+                    />
+                  </View>
+                )
+              })}
             </View>
           </>
         )}
@@ -462,7 +496,7 @@ function Runner({
   */
   const [savedOnStop, setSavedOnStop] = useState<{ seconds: number; bpm: number } | null>(null)
   const stop = () => {
-    const elapsed = session.elapsedMs
+    const elapsed = session.elapsed()
     session.stop()
     if ((mode.recordOnStop || endless) && session.phase === 'playing' && elapsed >= MIN_RECORDED_MS) {
       const seconds = Math.round(elapsed / 1000)
@@ -473,10 +507,16 @@ function Runner({
 
   const playing = session.phase === 'playing'
   const bar = session.bar
-  // Poziția ÎN pistă, nu cât ai cântat: în buclă, a doua reluare trece prin
-  // aceleași măsuri.
-  const activeStep =
-    bar && !bar.countIn ? Math.floor((session.positionMs - bar.atMs) / bar.stepMs) : -1
+  /*
+    Pasul care se aude, ca cursor la care se abonează notația (`playhead.ts`).
+    Poziția ÎN pistă, nu cât ai cântat: în buclă, a doua reluare trece prin
+    aceleași măsuri. Ecranul nu se mai redesenează la fiecare cadru: doar
+    celulele care se aprind și se sting.
+  */
+  const cursor = useMemo(
+    () => stepCursor(session.playhead, plan, (planned) => (planned.countIn ? -1 : planned.exerciseBar)),
+    [session.playhead, plan],
+  )
   /*
     Piesele care sună acum, pentru desenul setului.
 
@@ -487,13 +527,6 @@ function Runner({
 
     Nici în numărătoare: acolo se aud doar click-uri.
   */
-  const litPieces = useMemo(
-    () =>
-      playing && sound.hits !== false && bar && !bar.countIn
-        ? piecesSoundingAt(plan, session.positionMs)
-        : [],
-    [playing, sound.hits, bar, plan, session.positionMs],
-  )
   const musicalBars = plan.bars.filter((candidate) => !candidate.countIn).length
   /*
     Numărul măsurii vine din plan (`musicalIndex`), nu dintr-o aritmetică pe
@@ -526,15 +559,34 @@ function Runner({
     const next = change && playedById.get(change.exerciseId)
     return next ? { exercise: next, barsUntil: change!.barsUntil } : null
   }, [playing, bar, plan, playedById])
-  const beatNumber = bar
-    ? Math.min(bar.beatsPerBar, Math.floor((session.positionMs - bar.atMs) / (60_000 / bar.bpm)) + 1)
-    : 1
   /** Cât ai cântat, scris ca mm:ss. Are rost doar când sesiunea n-are capăt. */
   const playedClock = `${Math.floor(session.elapsedMs / 60_000)}:${String(
     Math.floor((session.elapsedMs % 60_000) / 1000),
   ).padStart(2, '0')}`
 
   const idle = session.phase === 'idle'
+
+  /*
+    Grilă sau portativ. Alegerea se ține minte cât e deschisă aplicația, pentru
+    toate catalogurile care o oferă: cine citește pe portativ la groove-uri vrea
+    portativ și la fill-uri.
+  */
+  const [notationView, setNotationView] = useState<NotationView>(() => notationPreference)
+  const chooseNotation = (view: NotationView) => {
+    haptic('light')
+    notationPreference = view
+    setNotationView(view)
+  }
+  const notation: PracticeCatalogue['renderNotation'] = (props) =>
+    catalogue.staffNotation && notationView === 'staff' ? (
+      <WithCursor cursor={props.cursor}>
+        {(barIndex, step) => (
+          <DrumStaff exercise={props.exercise} activeBar={barIndex} activeStep={step} />
+        )}
+      </WithCursor>
+    ) : (
+      catalogue.renderNotation(props)
+    )
 
   /*
     Desenul setului se pornește doar unde chiar încape.
@@ -624,7 +676,12 @@ function Runner({
       */}
       {showKit ? (
         <View onLayout={(event) => setKitHeight(event.nativeEvent.layout.height)}>
-          <KitDrawing lit={litPieces} compact />
+          <LiveKitDrawing
+            playhead={session.playhead}
+            plan={plan}
+            enabled={playing && sound.hits !== false}
+            compact
+          />
         </View>
       ) : null}
 
@@ -632,10 +689,14 @@ function Runner({
         Notația urmează măsura care SUNĂ, nu exercițiul ales: într-o ruletă sau la
         schimbarea de stil, altfel ai citi un groove și ai auzi altul.
       */}
-      {catalogue.renderNotation({
+      {catalogue.staffNotation ? (
+        <NotationSwitch view={notationView} onChange={chooseNotation} />
+      ) : null}
+      {notation({
         exercise: sounding,
-        activeBar: bar && !bar.countIn ? bar.exerciseBar : -1,
-        activeStep,
+        activeBar: -1,
+        activeStep: -1,
+        cursor,
         // Explicațiile stau doar înainte de start: în timpul sesiunii nu mai e
         // nimic de citit acolo, doar de urmărit.
         showHint: idle,
@@ -749,7 +810,7 @@ function Runner({
               </Text>
             ) : null}
             <Text style={{ fontSize: 28, lineHeight: 32, fontWeight: '900', color: publicColors.ink }}>
-              {beatNumber}
+              <BeatNumber playhead={session.playhead} bar={bar} />
             </Text>
             {/*
               Tempoul care SUNĂ, nu cel ales. La scara de tempo cele două diferă
@@ -799,7 +860,7 @@ function Runner({
                 fără explicații, acolo nu se cântă încă nimic.
               */}
               <View style={{ opacity: 0.55 }}>
-                {catalogue.renderNotation({
+                {notation({
                   exercise: upcoming.exercise,
                   activeBar: -1,
                   activeStep: -1,
@@ -1055,5 +1116,80 @@ function BigButton({
         {label}
       </Text>
     </Pressable>
+  )
+}
+
+/**
+ * Numărul timpului, mare. Se abonează singur la ceas și se redesenează o dată
+ * pe timp; restul ecranului nu se mai reface odată cu el.
+ */
+function BeatNumber({ playhead, bar }: { playhead: Playhead; bar: PlannedBar | null }) {
+  const beat = usePlayheadValue(
+    playhead,
+    (positionMs) =>
+      bar && positionMs >= 0
+        ? Math.max(1, Math.min(bar.beatsPerBar, Math.floor((positionMs - bar.atMs) / (60_000 / bar.bpm)) + 1))
+        : 1,
+    1,
+  )
+  return <>{beat}</>
+}
+
+type NotationView = 'grid' | 'staff'
+
+/** Alegerea grilă/portativ, ținută cât e deschisă aplicația. */
+let notationPreference: NotationView = 'grid'
+
+/** Comutatorul „Grilă / Portativ”, deasupra notației. */
+function NotationSwitch({
+  view,
+  onChange,
+}: {
+  view: NotationView
+  onChange: (view: NotationView) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <View
+      accessibilityRole="radiogroup"
+      style={{
+        flexDirection: 'row',
+        alignSelf: 'flex-start',
+        padding: 3,
+        gap: 3,
+        borderRadius: 12,
+        backgroundColor: '#F1F3F4',
+      }}
+    >
+      {(['grid', 'staff'] as const).map((option) => {
+        const selected = option === view
+        return (
+          <Pressable
+            key={option}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            onPress={() => onChange(option)}
+            style={{
+              paddingHorizontal: 14,
+              paddingVertical: 7,
+              borderRadius: 9,
+              backgroundColor: selected ? publicColors.card : 'transparent',
+              borderWidth: selected ? 1 : 0,
+              borderColor: publicColors.border,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '800',
+                color: selected ? publicColors.ink : publicColors.muted,
+              }}
+            >
+              {t(option === 'grid' ? 'drums.notationGrid' : 'drums.notationStaff')}
+            </Text>
+          </Pressable>
+        )
+      })}
+    </View>
   )
 }

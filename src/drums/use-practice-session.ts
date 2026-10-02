@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAudioPlayer } from 'expo-audio'
 import { loadPaused } from '../audio/load-paused'
 import { enablePlaybackAudioMode } from '../audio/session'
 import type { DrumPlan, PlannedBar } from './plan'
+import { barFinder, createPlayhead, type Playhead } from './playhead'
 import type { SessionTrack } from './session-track'
 
 /*
@@ -29,9 +30,16 @@ export interface PracticeSession {
    * tău nu. E ce se arată pe ecran la „fără limită”, și tot el se salvează.
    */
   elapsedMs: number
-  /** Unde ești ÎN pistă. Diferă de `elapsedMs` doar în buclă. */
-  positionMs: number
-  /** Măsura care se aude acum, sau `null` înainte de start și după final. */
+  /**
+   * Unde ești ÎN pistă, ca ceas la care te abonezi (`playhead.ts`), nu ca
+   * stare: citită la fiecare cadru, ca stare ar redesena tot ecranul de 60 de
+   * ori pe secundă. Componentele care au nevoie de pas sau de piesele lovite se
+   * abonează la el (`use-playhead.ts`).
+   */
+  playhead: Playhead
+  /** Timpul cântat, exact, la momentul cererii. `elapsedMs` e rotunjit la secundă. */
+  elapsed: () => number
+  /** Măsura care se aude acum, sau `null` înainte de start și după final. Se schimbă o dată pe măsură. */
   bar: PlannedBar | null
   start: () => void
   /** Oprire cerută de utilizator: sesiunea NU se socotește terminată. */
@@ -50,8 +58,15 @@ export function usePracticeSession(
 ): PracticeSession {
   const player = useAudioPlayer()
   const [phase, setPhase] = useState<PracticePhase>('idle')
+  /*
+    Timpul cântat se arată la secundă, deci starea se schimbă o dată pe secundă;
+    valoarea exactă stă în ref, pentru cine o cere (salvarea la oprire).
+  */
   const [elapsedMs, setElapsedMs] = useState(0)
-  const [positionMs, setPositionMs] = useState(0)
+  const elapsedRef = useRef(0)
+  const [playhead] = useState(createPlayhead)
+  const [barIndex, setBarIndex] = useState(-1)
+  const findBar = useMemo(() => barFinder(plan), [plan])
   /*
     Bucla trece prin zero fără să anunțe: `currentTime` sare înapoi, atât. Se
     numără reluările, ca timpul tău să crească în continuare, altfel un exercițiu
@@ -105,8 +120,10 @@ export function usePracticeSession(
     lastPosition.current = 0
     setPhase('idle')
     setElapsedMs(0)
-    setPositionMs(0)
-  }, [planKey, stopLoop])
+    elapsedRef.current = 0
+    playhead.set(-1)
+    setBarIndex(-1)
+  }, [planKey, stopLoop, playhead])
 
   useEffect(() => stopLoop, [stopLoop])
 
@@ -133,8 +150,16 @@ export function usePracticeSession(
       if (audioMs + 250 < lastPosition.current) cycles.current += 1
       lastPosition.current = audioMs
     }
-    setPositionMs(audioMs)
-    setElapsedMs(plan.loop ? cycles.current * cycleMs + audioMs : audioMs)
+    playhead.set(audioMs)
+    const elapsed = plan.loop ? cycles.current * cycleMs + audioMs : audioMs
+    elapsedRef.current = elapsed
+    // Starea se atinge doar când se schimbă ce se arată: secunda, măsura.
+    setElapsedMs((current) =>
+      Math.floor(current / 1000) === Math.floor(elapsed / 1000) ? current : elapsed,
+    )
+    const bar = findBar(audioMs)
+    const index = bar ? bar.index : -1
+    setBarIndex((current) => (current === index ? current : index))
 
     if (!plan.loop && !completed.current && audioMs >= plan.totalMs) {
       completed.current = true
@@ -157,7 +182,7 @@ export function usePracticeSession(
       return
     }
     schedule()
-  }, [plan, player, schedule, stopLoop])
+  }, [plan, player, schedule, stopLoop, playhead, findBar])
   tickRef.current = tick
 
   const start = useCallback(() => {
@@ -167,7 +192,9 @@ export function usePracticeSession(
     cycles.current = 0
     lastPosition.current = 0
     setElapsedMs(0)
-    setPositionMs(0)
+    elapsedRef.current = 0
+    playhead.set(-1)
+    setBarIndex(-1)
     setPhase('playing')
     /*
       Redarea pornește SINCRON, în același tick cu apăsarea.
@@ -223,7 +250,7 @@ export function usePracticeSession(
       // Fără sesiunea audio configurată redarea merge, doar că nu ține aplicația
       // vie în fundal. Nu e motiv să oprim ce deja sună.
     })
-  }, [plan.loop, player, schedule, stopLoop])
+  }, [plan.loop, player, schedule, stopLoop, playhead])
 
   const stop = useCallback(() => {
     stopLoop()
@@ -232,9 +259,11 @@ export function usePracticeSession(
     } catch {
       // Deja oprit.
     }
+    // Nimic nu mai cântă, deci nimic nu mai stă aprins.
+    playhead.set(-1)
     // Doar dacă n-a ajuns la capăt: altfel „Oprește” ar șterge o sesiune reușită.
     setPhase(completed.current ? 'done' : 'stopped')
-  }, [player, stopLoop])
+  }, [player, stopLoop, playhead])
 
   const reset = useCallback(() => {
     stopLoop()
@@ -243,7 +272,9 @@ export function usePracticeSession(
     cycles.current = 0
     lastPosition.current = 0
     setElapsedMs(0)
-    setPositionMs(0)
+    elapsedRef.current = 0
+    playhead.set(-1)
+    setBarIndex(-1)
     setPhase('idle')
     try {
       player.pause()
@@ -251,16 +282,13 @@ export function usePracticeSession(
     } catch {
       // Deja oprit.
     }
-  }, [player, stopLoop])
+  }, [player, stopLoop, playhead])
 
   // Măsura se caută după poziția ÎN pistă, nu după cât ai cântat: în buclă, a
   // doua reluare are aceleași măsuri, nu unele noi.
   const bar =
-    phase === 'playing' || phase === 'done'
-      ? (plan.bars.find(
-          (candidate) => positionMs >= candidate.atMs && positionMs < candidate.endMs,
-        ) ?? null)
-      : null
+    (phase === 'playing' || phase === 'done') && barIndex >= 0 ? (plan.bars[barIndex] ?? null) : null
+  const elapsed = useCallback(() => elapsedRef.current, [])
 
-  return { phase, elapsedMs, positionMs, bar, start, stop, reset }
+  return { phase, elapsedMs, playhead, elapsed, bar, start, stop, reset }
 }

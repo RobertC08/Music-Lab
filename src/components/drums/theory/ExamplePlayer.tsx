@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { Minus, Play, Plus, RotateCcw, Square, Timer } from 'lucide-react-native'
+import { Eye, EyeOff, Hand, Minus, Play, Plus, RotateCcw, Square, Timer } from 'lucide-react-native'
 import { publicColors } from '@/components/public-practice/ui'
+import { BassRow } from '@/components/drums/bass-row'
 import { GrooveGrid } from '@/components/drums/groove-grid'
 import { StickingRow } from '@/components/drums/sticking-row'
 import { MAX_BPM } from '@/lib/drums/exercise'
 import { planDrumMedley } from '@/lib/drums/plan'
 import { buildSessionTrack } from '@/lib/drums/session-track'
-import { piecesSoundingAt } from '@/lib/drums/sounding'
+import { stepCursor } from '@/lib/drums/playhead'
 import { usePracticeSession } from '@/lib/drums/use-practice-session'
 import { kitIfLoaded } from '@/lib/drums/kit'
-import type { DrumExample } from '@/lib/drums/theory'
+import { thinClicks, type DrumExample } from '@/lib/drums/theory'
 import { haptic } from '@/lib/haptics/game-haptics'
+import { ChartView } from './ChartView'
 import { DrumStaff } from './DrumStaff'
-import { KitDrawing } from './KitDiagram'
+import { LiveKitDrawing, WithCursor } from '@/components/drums/live'
 
 /*
   Exemplul ascultabil dintr-o lecție de manual.
@@ -93,14 +95,29 @@ export function ExamplePlayer({
     aceeași pistă, din același plan, deci merg mereu după tempoul ales.
   */
   const [bpm, setBpm] = useState(example.bpm)
+  /*
+    Un exemplu cu clicul scris (`example.click`) îl are mereu pornit, iar
+    comutatorul nu se arată: lecția e despre clic.
+  */
+  const clicks = example.click ? true : metronome
+  // „Cânți tu”: tobele tac, clicul și basul rămân.
+  const [selfPlay, setSelfPlay] = useState(false)
+  const [revealed, setRevealed] = useState(!example.reveal)
   const plan = useMemo(
-    () =>
-      planDrumMedley([{ exercise: example.exercise, bpm, repeats: passesFor(example, bpm) }], {
-        countInBars: 0,
-        clicks: metronome,
-        loop: true,
-      }),
-    [example, bpm, metronome],
+    () => {
+      const planned = planDrumMedley(
+        [{ exercise: example.exercise, bpm, repeats: passesFor(example, bpm) }],
+        { countInBars: 0, clicks, loop: true },
+      )
+      return example.click ? thinClicks(planned, example.click) : planned
+    },
+    /*
+      `selfPlay` nu schimbă planul, dar intră în dependențe dinadins: un plan nou
+      e semnalul la care sesiunea se resetează și exemplul repornește (`replan`),
+      cu tobele oprite sau pornite.
+    */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [example, bpm, clicks, selfPlay],
   )
   /*
     Randarea intră ca funcție, nu ca pistă gata făcută: altfel s-ar construi și
@@ -113,8 +130,15 @@ export function ExamplePlayer({
       vezi `kitReady` în `LessonScreen.tsx`. Exemplul se desenează doar după ce
       sunt gata, deci aici nu pot lipsi.
     */
-    () => buildSessionTrack(plan, { samples: kitIfLoaded()!, clicks: metronome, loop: true }),
-    [plan, metronome],
+    () =>
+      buildSessionTrack(plan, {
+        samples: kitIfLoaded()!,
+        clicks,
+        loop: true,
+        bass: example.bass,
+        hits: !selfPlay,
+      }),
+    [plan, clicks, example.bass, selfPlay],
   )
   const session = usePracticeSession(plan, prepare)
   const playing = session.phase === 'playing'
@@ -142,23 +166,14 @@ export function ExamplePlayer({
     change()
   }
 
-  // Măsura și pasul care se aud, ca grila să urmărească sunetul. `-1` în repaus.
-  const activeBar = playing && session.bar ? session.bar.index % example.exercise.bars.length : -1
-  const activeStep =
-    playing && session.bar
-      ? Math.min(
-          example.exercise.stepsPerBar - 1,
-          Math.floor((session.positionMs - session.bar.atMs) / session.bar.stepMs),
-        )
-      : -1
-
   /*
-    Ce piese cad ACUM, pentru desenul setului. Aceeași socoteală ca la ecranul
-    de practică, deci stă într-un singur loc: `lib/drums/sounding.ts`.
+    Măsura și pasul care se aud, ca cursor la care se abonează desenele
+    (`playhead.ts`). Ecranul ăsta nu se mai redesenează la fiecare cadru: doar
+    celulele care se aprind și se sting, și desenul setului la fiecare lovitură.
   */
-  const litPieces = useMemo(
-    () => (playing ? piecesSoundingAt(plan, session.positionMs) : []),
-    [playing, plan, session.positionMs],
+  const cursor = useMemo(
+    () => stepCursor(session.playhead, plan, (bar) => bar.index % example.exercise.bars.length),
+    [session.playhead, plan, example.exercise.bars.length],
   )
 
   return (
@@ -196,36 +211,55 @@ export function ExamplePlayer({
           Comutatorul de metronom. Din mers, exemplul repornește cu sau fără
           click (`replan`), nu se oprește.
         */}
-        <Pressable
-          accessibilityRole="switch"
-          accessibilityState={{ checked: metronome }}
-          accessibilityLabel={t('drums.theoryMetronome')}
-          onPress={() => replan(onToggleMetronome)}
-          style={({ pressed }) => ({
-            minHeight: 52,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            borderRadius: 16,
-            borderWidth: 2,
-            borderColor: metronome ? accent : publicColors.border,
-            backgroundColor: metronome ? accent : pressed ? '#F7F8F9' : publicColors.card,
-            paddingHorizontal: 14,
-          })}
-        >
-          <Timer size={18} color={metronome ? '#FFFFFF' : publicColors.muted} />
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '800',
-              color: metronome ? '#FFFFFF' : publicColors.muted,
-            }}
+        {example.click ? null : (
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: metronome }}
+            accessibilityLabel={t('drums.theoryMetronome')}
+            onPress={() => replan(onToggleMetronome)}
+            style={({ pressed }) => ({
+              minHeight: 52,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              borderRadius: 16,
+              borderWidth: 2,
+              borderColor: metronome ? accent : publicColors.border,
+              backgroundColor: metronome ? accent : pressed ? '#F7F8F9' : publicColors.card,
+              paddingHorizontal: 14,
+            })}
           >
-            {t('drums.theoryMetronome')}
-          </Text>
-        </Pressable>
+            <Timer size={18} color={metronome ? '#FFFFFF' : publicColors.muted} />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '800',
+                color: metronome ? '#FFFFFF' : publicColors.muted,
+              }}
+            >
+              {t('drums.theoryMetronome')}
+            </Text>
+          </Pressable>
+        )}
       </View>
+
+      {example.playAlong ? (
+        <View style={{ gap: 6 }}>
+          <Toggle
+            on={selfPlay}
+            accent={accent}
+            label={t('drums.theoryPlayAlong')}
+            icon={<Hand size={18} color={selfPlay ? '#FFFFFF' : publicColors.muted} />}
+            onPress={() => replan(() => setSelfPlay((value) => !value))}
+          />
+          {selfPlay ? (
+            <Text style={{ fontSize: 12, lineHeight: 17, color: publicColors.muted }}>
+              {t('drums.theoryPlayAlongHint')}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <TempoButton
@@ -296,7 +330,45 @@ export function ExamplePlayer({
         Desenul e `KitDrawing`, nu `KitDiagram`: aici nu se atinge nimic, iar
         varianta interactivă ar porni nouă playere sub fiecare exemplu.
       */}
-      {example.showKit ? <KitDrawing lit={litPieces} /> : null}
+      {example.showKit ? (
+        <LiveKitDrawing playhead={session.playhead} plan={plan} enabled={playing && revealed} />
+      ) : null}
+
+      {example.chart ? (
+        <WithCursor cursor={cursor}>
+          {(bar) => <ChartView chart={example.chart!} activeBar={bar} accent={accent} />}
+        </WithCursor>
+      ) : null}
+
+      {/*
+        La transcriere, notația stă ascunsă până o ceri: la vedere, scrisul după
+        ureche ar deveni copiat.
+      */}
+      {example.reveal ? (
+        <View style={{ gap: 6 }}>
+          {revealed ? null : (
+            <Text style={{ fontSize: 12, lineHeight: 17, color: publicColors.muted }}>
+              {t('drums.theoryRevealHint')}
+            </Text>
+          )}
+          <Toggle
+            on={revealed}
+            accent={accent}
+            label={revealed ? t('drums.theoryHideNotation') : t('drums.theoryRevealNotation')}
+            icon={
+              revealed ? (
+                <EyeOff size={18} color="#FFFFFF" />
+              ) : (
+                <Eye size={18} color={publicColors.muted} />
+              )
+            }
+            onPress={() => {
+              haptic('light')
+              setRevealed((value) => !value)
+            }}
+          />
+        </View>
+      ) : null}
 
       {/*
         Portativul, când lecția e despre scris.
@@ -306,13 +378,12 @@ export function ExamplePlayer({
         o construiește: elevul trebuie să vadă că cele două desene spun același
         lucru, nu să le compare.
       */}
-      {example.showStaff ? (
-        <DrumStaff
-          exercise={example.exercise}
-          activeBar={activeBar}
-          activeStep={activeStep}
-          accent={accent}
-        />
+      {example.showStaff && revealed ? (
+        <WithCursor cursor={cursor}>
+          {(bar, step) => (
+            <DrumStaff exercise={example.exercise} activeBar={bar} activeStep={step} accent={accent} />
+          )}
+        </WithCursor>
       ) : null}
 
       {/*
@@ -323,24 +394,82 @@ export function ExamplePlayer({
         celulă se aprinde, iar un pas diferență ar arăta mâna greșită exact
         acolo unde elevul se uită.
       */}
-      {example.showSticking ? (
-        <StickingRow
-          exercise={example.exercise}
-          activeBar={activeBar}
-          activeStep={activeStep}
-          showHint={!playing}
-        />
+      {example.showSticking && revealed ? (
+        <WithCursor cursor={cursor}>
+          {(bar, step) => (
+            <StickingRow
+              exercise={example.exercise}
+              activeBar={bar}
+              activeStep={step}
+              showHint={!playing}
+            />
+          )}
+        </WithCursor>
       ) : null}
 
-      {example.showGrid === false ? null : (
-        <GrooveGrid
-          exercise={example.exercise}
-          activeBar={activeBar}
-          activeStep={activeStep}
-          showHint={false}
-        />
+      {/*
+        Basul deasupra grilei, pe aceleași coloane: nota de bas și toba mare de
+        pe același pas stau una sub alta.
+      */}
+      {example.bass ? (
+        <WithCursor cursor={cursor}>
+          {(bar, step) => (
+            <BassRow
+              line={example.bass!}
+              stepsPerBar={example.exercise.stepsPerBar}
+              beatsPerBar={example.exercise.beatsPerBar}
+              activeBar={bar}
+              activeStep={step}
+            />
+          )}
+        </WithCursor>
+      ) : null}
+
+      {example.showGrid === false || !revealed ? null : (
+        <GrooveGrid exercise={example.exercise} cursor={cursor} showHint={false} />
       )}
     </View>
+  )
+}
+
+/** Un comutator lat, la fel ca cel de metronom: plin când e pornit. */
+function Toggle({
+  on,
+  accent,
+  label,
+  icon,
+  onPress,
+}: {
+  on: boolean
+  accent: string
+  label: string
+  icon: React.ReactNode
+  onPress: () => void
+}) {
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 44,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        borderRadius: 14,
+        borderWidth: 2,
+        borderColor: on ? accent : publicColors.border,
+        backgroundColor: on ? accent : pressed ? '#F7F8F9' : publicColors.card,
+        paddingHorizontal: 14,
+      })}
+    >
+      {icon}
+      <Text style={{ fontSize: 14, fontWeight: '800', color: on ? '#FFFFFF' : publicColors.muted }}>
+        {label}
+      </Text>
+    </Pressable>
   )
 }
 

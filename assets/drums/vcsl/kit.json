@@ -1,0 +1,123 @@
+{
+  "id": "vcsl",
+  "title": "Versilian Community Sample Library (cowbell, rimshot, rim click)",
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "credit": "Versilian Studios LLC, VCSL (public domain, no attribution required)",
+  "source": "https://github.com/sgossner/VCSL",
+  "sampleRate": 44100,
+  "channels": 1,
+  "bitDepth": 16,
+  "files": [
+    {
+      "piece": "cowbell",
+      "layer": "ghost",
+      "file": "cowbell-ghost.wav",
+      "bytes": 44144,
+      "sha256": "8b96511a82aeb49d8f54d2375eb3b1a4ed3febcbe065484bf9f2e3e88814d341",
+      "peak": 0.085,
+      "rms50ms": 0.0164,
+      "sourceFiles": [
+        "Idiophones/Struck Idiophones/Cowbells/Cowbell1_Hit_v2_rr1_Mid.wav"
+      ]
+    },
+    {
+      "piece": "cowbell",
+      "layer": "normal",
+      "file": "cowbell-normal.wav",
+      "bytes": 44144,
+      "sha256": "940b9d476cf9fb52d004a3a02f55987a33a2132a183b56621b8e50668498d6b3",
+      "peak": 0.133,
+      "rms50ms": 0.0334,
+      "sourceFiles": [
+        "Idiophones/Struck Idiophones/Cowbells/Cowbell1_Hit_v3_rr1_Mid.wav"
+      ]
+    },
+    {
+      "piece": "cowbell",
+      "layer": "accent",
+      "file": "cowbell-accent.wav",
+      "bytes": 44144,
+      "sha256": "ab675bdb24580a5460a46553b73f78e7d9c3eb1a8b981cff53bfdb461ef0bfce",
+      "peak": 0.42,
+      "rms50ms": 0.1389,
+      "sourceFiles": [
+        "Idiophones/Struck Idiophones/Cowbells/Cowbell1_Hit_v4_rr1_Mid.wav"
+      ]
+    },
+    {
+      "piece": "rimshot",
+      "layer": "ghost",
+      "file": "rimshot-ghost.wav",
+      "bytes": 39734,
+      "sha256": "4d4742e15edddcf59666ddc000fd2f2e2159ca9869657642accf56a414c50bbc",
+      "peak": 0.442,
+      "rms50ms": 0.0778,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rimshot_mf.wav"
+      ]
+    },
+    {
+      "piece": "rimshot",
+      "layer": "normal",
+      "file": "rimshot-normal.wav",
+      "bytes": 39734,
+      "sha256": "cc59e4c18a89146911fcd61092321b5b8229e2038b04b30fcbe68e47f7e7d1af",
+      "peak": 0.791,
+      "rms50ms": 0.1673,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rimshot_f.wav"
+      ]
+    },
+    {
+      "piece": "rimshot",
+      "layer": "accent",
+      "file": "rimshot-accent.wav",
+      "bytes": 39022,
+      "sha256": "a55f35007f453bbf60ea9d849746dc6030182c22ccd2e1ad873179b608efde7e",
+      "peak": 0.951,
+      "rms50ms": 0.2311,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rimshot_fff_rr1.wav"
+      ]
+    },
+    {
+      "piece": "rimClick",
+      "layer": "ghost",
+      "file": "rimClick-ghost.wav",
+      "bytes": 30912,
+      "sha256": "9db3fe1d896da7c08e5c1fbac2875fd7dabc27f2ce412315e3ac135ca1d08766",
+      "peak": 0.076,
+      "rms50ms": 0.0157,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rim_fff_rr1.wav"
+      ],
+      "derived": "×0.22 din stratul fff"
+    },
+    {
+      "piece": "rimClick",
+      "layer": "normal",
+      "file": "rimClick-normal.wav",
+      "bytes": 30912,
+      "sha256": "5aff0c64ddb49b1007440660299437f292f34e60dae61a946ae7f37b4928364b",
+      "peak": 0.172,
+      "rms50ms": 0.0356,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rim_fff_rr1.wav"
+      ],
+      "derived": "×0.5 din stratul fff"
+    },
+    {
+      "piece": "rimClick",
+      "layer": "accent",
+      "file": "rimClick-accent.wav",
+      "bytes": 30912,
+      "sha256": "240c86e13cc785c71cfab6c2ccb4b5a4c45f644dc10c175c5afff3460763ab30",
+      "peak": 0.344,
+      "rms50ms": 0.0713,
+      "sourceFiles": [
+        "Membranophones/Struck Membranophones/Legacy Snares/drum1/snare1_rim_fff_rr1.wav"
+      ]
+    }
+  ]
+}

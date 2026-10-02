@@ -1,4 +1,6 @@
 import type { LocalizedText } from '@/lib/rhythm/curriculum/localized'
+import { validateBassLine, type BassLine } from '../bass'
+import type { DrumQuiz } from './quiz'
 import { validateExercise, type DrumExercise, type Vocabulary } from '../exercise'
 
 /*
@@ -101,6 +103,62 @@ export interface DrumExample<Text = string> {
    * măsură, în amândouă, una sub alta.
    */
   showStaff?: boolean
+  /**
+   * Linia de bas cântată odată cu tobele, pe aceeași grilă (`bass.ts`).
+   *
+   * Pentru Etapa „Muzician”, unde subiectul e ce face toba mare FAȚĂ de bas.
+   * Se desenează și un rând cu notele, deasupra grilei, ca să se vadă unde cad
+   * una față de alta, nu doar să se audă.
+   */
+  bass?: BassLine
+  /**
+   * Pe ce timpi bate clicul, pe măsură (de la 1). Se reia ciclic peste măsurile
+   * exercițiului.
+   *
+   * Pentru lecția despre clic, unde subiectul chiar E clicul: pe fiecare timp,
+   * apoi pe 2 și 4, apoi doar pe „unu”. Cu el setat, metronomul e mereu pornit
+   * și comutatorul lui nu se mai arată: un exemplu despre clic fără clic n-ar
+   * spune nimic.
+   */
+  click?: number[][]
+  /**
+   * Butonul „Cânți tu”: tobele tac, rămân clicul și basul, iar elevul cântă
+   * peste ele. Grila și desenul merg mai departe, deci arată ce ar fi trebuit
+   * să cadă unde.
+   *
+   * E partea practică a lecțiilor de ascultare, unde nu există un exercițiu de
+   * practică propriu-zis: ai auzit cum sună, acum ții tu.
+   */
+  playAlong?: boolean
+  /**
+   * Notația (portativul, grila) pornește ascunsă, sub un buton „Arată notația”,
+   * iar desenul setului nu se aprinde până atunci.
+   *
+   * Pentru transcriere: dacă răspunsul e la vedere, exercițiul de a scrie după
+   * ureche devine unul de copiat. Și setul aprins ar fi un răspuns: spune ce
+   * piesă sună, adică exact ce trebuie auzit.
+   */
+  reveal?: boolean
+  /**
+   * Chart-ul piesei: o intrare pe fiecare măsură a exercițiului, desenată ca pe
+   * o partitură de trupă (bare oblice, fill-uri, lovituri), cu măsura care se
+   * aude aprinsă.
+   */
+  chart?: ChartBar<Text>[]
+}
+
+/** O măsură de chart, cum o scrie un aranjor, nu cum o cântă toboșarul. */
+export interface ChartBar<Text = string> {
+  /** Numele părții care începe aici („Strofă”, „Refren”). */
+  label?: Text
+  /**
+   * `groove`, bare oblice: cântă groove-ul.
+   * `fill`, măsura de fill.
+   * `hits`, loviturile trupei, scrise pe optimi în `hits`.
+   */
+  kind: 'groove' | 'fill' | 'hits'
+  /** Doar la `hits`: opt caractere, `x` unde lovește trupa. */
+  hits?: string
 }
 
 /**
@@ -155,6 +213,12 @@ export interface DrumTheory<Text = string> {
   stages: DrumStage<Text>[]
   /** Ordinea din fișier e ordinea de pe hartă. */
   lessons: DrumTheoryLesson<Text>[]
+  /**
+   * Quiz-urile: unul după fiecare lecție, unul recapitulativ la capătul fiecărei
+   * etape (`quiz.ts`). Opțional doar ca manualele sintetice din teste să nu
+   * trebuiască să-l scrie.
+   */
+  quizzes?: DrumQuiz<Text>[]
 }
 
 /**
@@ -203,6 +267,28 @@ export function validateDrumTheory(
       const example = section.example
       if (!example) continue
       for (const problem of validateExercise(example.exercise, vocabulary)) at(problem)
+      if (example.bass) {
+        for (const problem of validateBassLine(example.bass, example.exercise.stepsPerBar))
+          at(problem)
+      }
+      const { beatsPerBar } = example.exercise
+      for (const beats of example.click ?? []) {
+        if (beats.some((beat) => !Number.isInteger(beat) || beat < 1 || beat > beatsPerBar)) {
+          at(`clicul pe timpii ${beats.join(',')}, în afara măsurii de ${beatsPerBar}`)
+        }
+      }
+      if (example.chart) {
+        if (example.chart.length !== example.exercise.bars.length) {
+          at(
+            `chart-ul are ${example.chart.length} măsuri, exercițiul ${example.exercise.bars.length}`,
+          )
+        }
+        example.chart.forEach((bar, index) => {
+          if (bar.kind === 'hits' && !/^[x.]{8}$/.test(bar.hits ?? '')) {
+            at(`chart, măsura ${index + 1}: loviturile se scriu pe opt optimi`)
+          }
+        })
+      }
       const { min, max } = example.exercise.tempo
       if (example.bpm < min || example.bpm > max) {
         at(`exemplul se aude la ${example.bpm} BPM, în afara intervalului ${min}-${max}`)
