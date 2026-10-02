@@ -14,8 +14,13 @@ import {
   type DrumTheoryLesson,
 } from '@/lib/drums/theory'
 
-/** Cel mai bun scor la fiecare quiz, după id. */
-export type QuizScores = Record<string, { score: number; total: number }>
+import { lessonPassed, stageProgress, type QuizScores } from '@/lib/drums/theory/progress'
+
+export type { QuizScores }
+
+/** Verdele hărții: lecție cu quiz trecut, etapă terminată. */
+const PASSED = '#1E8E5A'
+const PASSED_SOFT = '#EAF6EF'
 
 /*
   Intrarea în manual, deocamdată o listă, nu harta.
@@ -105,19 +110,57 @@ export function TheoryIndexScreen({
           const lessons = theory.lessons.filter((lesson) => lesson.stage === stage.id)
           const review = reviewForStage(theory, stage.id)
           const reviewScore = review ? scores[review.id] : undefined
+          const progress = stageProgress(theory, scores, stage.id)
           return (
             <View key={stage.id} style={{ gap: 8 }}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: '800',
-                  letterSpacing: 1.1,
-                  textTransform: 'uppercase',
-                  color: stage.accent,
-                }}
-              >
-                {stage.title}
-              </Text>
+              {/*
+                Numele etapei și cât din ea e trecut. Verde abia când toate
+                quiz-urile lecțiilor și recapitularea sunt trecute.
+              */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 12,
+                    fontWeight: '800',
+                    letterSpacing: 1.1,
+                    textTransform: 'uppercase',
+                    color: progress.complete ? PASSED : stage.accent,
+                  }}
+                >
+                  {stage.title}
+                </Text>
+                {progress.totalLessons > 0 ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                      paddingHorizontal: 8,
+                      paddingVertical: 3,
+                      borderRadius: 999,
+                      backgroundColor: progress.complete ? PASSED : '#F1F3F4',
+                    }}
+                  >
+                    {progress.complete ? <Check size={12} color="#FFFFFF" /> : null}
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        fontWeight: '800',
+                        color: progress.complete ? '#FFFFFF' : publicColors.muted,
+                        fontVariant: ['tabular-nums'],
+                      }}
+                    >
+                      {progress.complete
+                        ? t('drums.theoryStageDone')
+                        : t('drums.theoryStageProgress', {
+                            done: progress.passedLessons,
+                            total: progress.totalLessons,
+                          })}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
               <Text style={{ fontSize: 13, lineHeight: 19, color: publicColors.muted }}>
                 {stage.subtitle}
               </Text>
@@ -133,39 +176,71 @@ export function TheoryIndexScreen({
                   {t('drums.theorySoon')}
                 </Text>
               ) : (
-                lessons.map((lesson) => (
-                  <Pressable
-                    key={lesson.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${lesson.title}. ${lesson.goal}`}
-                    onPress={() => onOpenLesson(lesson)}
-                    style={({ pressed }) => ({
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 12,
-                      borderRadius: 18,
-                      borderWidth: 2,
-                      borderColor: stage.border,
-                      backgroundColor: pressed ? stage.soft : publicColors.card,
-                      padding: 16,
-                    })}
-                  >
-                    <View style={{ flex: 1, gap: 3 }}>
-                      <Text style={{ fontSize: 16, fontWeight: '800', color: publicColors.ink }}>
-                        {lesson.title}
-                      </Text>
-                      <Text style={{ fontSize: 13, lineHeight: 19, color: publicColors.muted }}>
-                        {lesson.goal}
-                      </Text>
-                      <QuizBadge
-                        quiz={quizForLesson(theory, lesson.id)}
-                        scores={scores}
-                        accent={stage.accent}
-                      />
-                    </View>
-                    <ChevronRight size={20} color={publicColors.muted} />
-                  </Pressable>
-                ))
+                lessons.map((lesson, position) => {
+                  /*
+                    Verde doar cu quiz-ul trecut. Lecția se deschide oricum:
+                    verdele e progres, nu poartă.
+                  */
+                  const done = lessonPassed(theory, scores, lesson.id)
+                  return (
+                    <Pressable
+                      key={lesson.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${lesson.title}. ${lesson.goal}${done ? `. ${t('drums.theoryLessonPassed')}` : ''}`}
+                      onPress={() => onOpenLesson(lesson)}
+                      style={({ pressed }) => ({
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 12,
+                        borderRadius: 18,
+                        borderWidth: 2,
+                        borderColor: done ? PASSED : stage.border,
+                        backgroundColor: pressed
+                          ? stage.soft
+                          : done
+                            ? PASSED_SOFT
+                            : publicColors.card,
+                        padding: 16,
+                      })}
+                    >
+                      {/* Nodul hărții: numărul lecției, sau bifa când quiz-ul e trecut. */}
+                      <View
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 15,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderWidth: done ? 0 : 2,
+                          borderColor: stage.border,
+                          backgroundColor: done ? PASSED : publicColors.card,
+                        }}
+                      >
+                        {done ? (
+                          <Check size={16} color="#FFFFFF" />
+                        ) : (
+                          <Text style={{ fontSize: 13, fontWeight: '900', color: stage.accent }}>
+                            {position + 1}
+                          </Text>
+                        )}
+                      </View>
+                      <View style={{ flex: 1, gap: 3 }}>
+                        <Text style={{ fontSize: 16, fontWeight: '800', color: publicColors.ink }}>
+                          {lesson.title}
+                        </Text>
+                        <Text style={{ fontSize: 13, lineHeight: 19, color: publicColors.muted }}>
+                          {lesson.goal}
+                        </Text>
+                        <QuizBadge
+                          quiz={quizForLesson(theory, lesson.id)}
+                          scores={scores}
+                          accent={stage.accent}
+                        />
+                      </View>
+                      <ChevronRight size={20} color={publicColors.muted} />
+                    </Pressable>
+                  )
+                })
               )}
               {/*
                 Recapitularea, după ultima lecție a etapei: vine la capătul
@@ -181,9 +256,13 @@ export function TheoryIndexScreen({
                     gap: 12,
                     borderRadius: 18,
                     borderWidth: 2,
-                    borderStyle: 'dashed',
-                    borderColor: stage.accent,
-                    backgroundColor: pressed ? stage.soft : publicColors.card,
+                    borderStyle: progress.reviewPassed && reviewScore ? 'solid' : 'dashed',
+                    borderColor: progress.reviewPassed && reviewScore ? PASSED : stage.accent,
+                    backgroundColor: pressed
+                      ? stage.soft
+                      : progress.reviewPassed && reviewScore
+                        ? PASSED_SOFT
+                        : publicColors.card,
                     padding: 16,
                   })}
                 >

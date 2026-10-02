@@ -41,8 +41,17 @@ Două cerințe de produs, valabile pentru toate secțiunile de mai sus:
   practică, nivelurile sunt ordinea din cataloage plus `requires`, iar la
   groove-uri și grupele pe stil (`groupOf`). Ecranele din sandbox sunt liste
   (`TheoryIndexScreen`, lista din `PracticeScreen`); harta e de făcut în
-  aplicație. Pe hartă, un nod se poate deschide oricând, iar starea lui
-  (necitit / citit / quiz trecut, cu scorul) vine din persistența de la §4.
+  aplicație. Pe hartă, un nod se poate deschide oricând, iar starea lui vine
+  din persistența de la §4.
+- **Verde pe hartă = quiz trecut, nu lecție citită.** O lecție devine verde doar
+  după ce i-ai trecut quiz-ul (80%); citită, dar fără quiz, rămâne neutră, deși
+  se poate deschide oricând. O etapă e verde („Etapă terminată”) doar când
+  toate quiz-urile lecțiilor ei ȘI recapitularea sunt trecute; până atunci
+  arată „3/7 lecții”. Regula e scrisă o dată, ca funcție pură testată:
+  `lessonPassed` și `stageProgress` din `src/drums/theory/progress.ts`
+  (exportate și din `@/lib/drums/theory`). Lista din sandbox
+  (`TheoryIndexScreen`) o folosește deja; harta din aplicație ar trebui să o
+  folosească pe aceeași, nu să o rescrie.
 
 Legături între secțiuni, deja în conținut:
 
@@ -140,6 +149,7 @@ Toate cheile noi sunt sub `drums.` și există doar în **română și engleză*
 | Groove-uri | `grooveStyle_*` (titlurile de stil din listă), `grv_*` pentru cele 14 groove-uri noi (+ `_how`), plus textele schimbate la `grv_rock_basic_how`, `grv_rock_backbeat` |
 | Fill-uri avansate | `advancedFillsTitle`, `advancedFillsIntro`, `afill_*` (20 × titlu + `_how`) |
 | Practică | `notationGrid`, `notationStaff` |
+| Harta manualului | `theoryStageProgress`, `theoryStageDone`, `theoryLessonPassed` |
 
 Atenție la `quizReviewWrong_few`: româna are trei forme de plural
 („o greșeală / 3 greșeli / 20 de greșeli”), engleza două.

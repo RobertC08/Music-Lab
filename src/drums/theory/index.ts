@@ -76,6 +76,8 @@ export const drumTheorySource = source
 
 export { drumStageIds, validateDrumTheory } from './types'
 export { theoryVocabulary, thinClicks } from './bars'
+export { lessonPassed, stageProgress } from './progress'
+export type { QuizScores, StageProgress } from './progress'
 export {
   gradeMarkGrid,
   answerRow,
