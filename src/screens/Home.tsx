@@ -1,4 +1,5 @@
 import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { colors, font } from '../theme'
@@ -18,6 +19,12 @@ export function Home({
   onOpenGrooves,
   onOpenFills,
   onOpenAdvancedFills,
+  onOpenGuitarChords,
+  onOpenGuitarGenerator,
+  onOpenGuitarChanges,
+  onOpenGuitarStrum,
+  onOpenGuitarFingers,
+  onOpenGuitarScales,
 }: {
   onOpenCategory: (category: Category) => void
   /** Tobe: insotitor de practica. Fara scor, deci nu e o categorie de jocuri. */
@@ -26,6 +33,17 @@ export function Home({
   onOpenGrooves?: () => void
   onOpenFills?: () => void
   onOpenAdvancedFills?: () => void
+  /** Chitară: biblioteca de acorduri, pe niveluri. */
+  onOpenGuitarChords?: () => void
+  /** Chitară: generatorul de acorduri, funcție separată de bibliotecă. */
+  onOpenGuitarGenerator?: () => void
+  /** Chitară: însoțitorul de practică pentru schimbările de acorduri. Fără scor. */
+  onOpenGuitarChanges?: () => void
+  /** Chitară: însoțitorul de strumming. Fără scor. */
+  onOpenGuitarStrum?: () => void
+  /** Chitară: exerciții pentru degete, în tabulatură. Fără scor. */
+  onOpenGuitarFingers?: () => void
+  onOpenGuitarScales?: () => void
   /**
    * Bancul de timing e unealta de diagnostic, nu functionalitate: nu se
    * livreaza la integrare. Fara el link-ul nu se deseneaza deloc, ca sa nu
@@ -33,6 +51,7 @@ export function Home({
    */
   onOpenBench?: () => void
 }) {
+  const { t } = useTranslation()
   const { width } = useWindowDimensions()
   const contentWidth = Math.min(Math.max(width - 40, 0), 580)
   const cardHeight = Math.min(460, Math.max(300, Math.round(contentWidth * 0.95)))
@@ -264,6 +283,138 @@ export function Home({
           </Text>
           <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
             Saisprezecimi, triolete si sextolete in aceeasi masura.
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarChords ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarChords}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.chordsCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.chordsCardHint')}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarChanges ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarChanges}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.changesCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.changesCardHint')}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarStrum ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarStrum}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.strumCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.strumCardHint')}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarFingers ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarFingers}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.fingerCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.fingerCardHint')}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarScales ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarScales}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.scalesCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.scalesCardHint')}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {onOpenGuitarGenerator ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenGuitarGenerator}
+          style={({ pressed }) => ({
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: colors.border,
+            padding: 18,
+            gap: 4,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Text style={{ fontFamily: font, fontSize: 16, fontWeight: '800', color: colors.ink }}>
+            {t('guitar.generatorCard')}
+          </Text>
+          <Text style={{ fontFamily: font, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+            {t('guitar.generatorCardHint')}
           </Text>
         </Pressable>
       ) : null}

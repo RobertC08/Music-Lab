@@ -1,6 +1,7 @@
 import { BASS_GAIN, bassVoice, placeBass, type BassLine } from './bass'
 import type { Hit, KitPiece } from './exercise'
 import type { DrumPlan } from './plan'
+import { accentClick, CLICK_VERSION, plainClick } from './click'
 import { SAMPLE_RATE, encodeWav } from './wav'
 
 /*
@@ -92,12 +93,6 @@ export const HIT_GAIN: Record<Hit, number> = {
  */
 export const MASTER_GAIN = 0.62
 
-/** Click-urile de metronom, sintetizate, singurul sunet care nu e o mostră. */
-const clickTones = {
-  accent: { frequency: 1_760, decay: 0.04, gain: 0.34, attack: 0.0012 },
-  plain: { frequency: 1_100, decay: 0.03, gain: 0.2, attack: 0.0012 },
-} as const
-
 export interface RenderOptions {
   samples: KitSamples
   mix?: Partial<Record<KitPiece, number>>
@@ -146,21 +141,6 @@ export interface RenderedTrack {
   /** Vârful absolut înainte de retezare. Peste 1 înseamnă că s-a retezat. */
   peak: number
 }
-
-function clickSamples(accent: boolean): Float32Array {
-  const { frequency, decay, gain, attack } = accent ? clickTones.accent : clickTones.plain
-  const length = Math.ceil(decay * 3 * SAMPLE_RATE)
-  const out = new Float32Array(length)
-  for (let index = 0; index < length; index += 1) {
-    const time = index / SAMPLE_RATE
-    out[index] =
-      Math.sin(2 * Math.PI * frequency * time) * Math.min(1, time / attack) * Math.exp(-time / decay) * gain
-  }
-  return out
-}
-
-const accentClick = clickSamples(true)
-const plainClick = clickSamples(false)
 
 export function renderDrumTrack(plan: DrumPlan, options: RenderOptions): RenderedTrack {
   const mix = { ...DEFAULT_MIX, ...options.mix }
@@ -273,7 +253,7 @@ export function drumTrackKey(
   const parts = [
     kitId,
     plan.exerciseId,
-    options.clicks === false ? 'mute' : 'click',
+    options.clicks === false ? 'mute' : `click${CLICK_VERSION}`,
     options.hits === false ? 'nodrums' : 'drums',
     options.gap ? 'gap' : 'full',
     options.loop ? 'loop' : 'once',

@@ -1,4 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
+import { recordAttempt, recordCompletion, type PatternProgress } from '@/lib/guitar/scale-progress'
 
 /*
   Shim de store pentru sandbox.
@@ -29,16 +30,41 @@ interface GuestPracticeSessionInput {
   title: string
 }
 
+/**
+ * Progresul la game și arpegii (`src/guitar/scale-progress.ts`), pe cheia
+ * `progressKey`. În ToneTrack intră în store-ul adevărat, cu persistență.
+ */
+export interface GuitarPatternProgress {
+  exercises: Record<string, PatternProgress>
+}
+
 interface State {
   drumProgress: DrumProgress
+  guitarPatternProgress: GuitarPatternProgress
+  startGuitarPattern: (key: string, bpm: number) => void
+  completeGuitarPattern: (key: string, bpm: number) => void
   completeDrumSession: (exerciseId: string, bpm: number, durationSeconds: number) => void
   addSession: (session: GuestPracticeSessionInput) => void
 }
 
 const listeners = new Set<() => void>()
 
+const updatePattern = (key: string, update: (previous: PatternProgress | undefined) => PatternProgress) => {
+  state = {
+    ...state,
+    guitarPatternProgress: {
+      exercises: { ...state.guitarPatternProgress.exercises, [key]: update(state.guitarPatternProgress.exercises[key]) },
+    },
+  }
+  for (const listener of listeners) listener()
+}
+
 let state: State = {
   drumProgress: { exercises: {} },
+  guitarPatternProgress: { exercises: {} },
+  startGuitarPattern: (key, bpm) => updatePattern(key, (previous) => recordAttempt(previous, bpm, new Date().toISOString())),
+  completeGuitarPattern: (key, bpm) =>
+    updatePattern(key, (previous) => recordCompletion(previous, bpm, new Date().toISOString())),
   completeDrumSession: (exerciseId, bpm, durationSeconds) => {
     const previous = state.drumProgress.exercises[exerciseId]
     state = {

@@ -15,6 +15,8 @@ export default defineConfig({
       '@/components/rhythm': at('./src/components'),
       '@/lib/drums': at('./src/drums'),
       '@/components/drums': at('./src/components/drums'),
+      '@/lib/guitar': at('./src/guitar'),
+      '@/components/guitar': at('./src/components/guitar'),
       '@/lib/guest': at('./guest'),
       '@/lib/haptics': at('./haptics'),
     },

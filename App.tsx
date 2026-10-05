@@ -15,6 +15,12 @@ import { TheoryIndexScreen, type QuizScores } from './src/components/drums/theor
 import { DrumQuizScreen } from './src/components/drums/theory/quiz/QuizScreen'
 import { DrumTheoryLessonScreen } from './src/components/drums/theory/LessonScreen'
 import { getDrumTheory, quizForLesson } from './src/drums/theory'
+import { ChordLibraryScreen } from './src/components/guitar/screens/ChordLibraryScreen'
+import { ChordGeneratorScreen } from './src/components/guitar/screens/ChordGeneratorScreen'
+import { ChordChangesScreen } from './src/components/guitar/screens/ChordChangesScreen'
+import { StrumPracticeScreen } from './src/components/guitar/screens/StrumPracticeScreen'
+import { FingerPracticeScreen } from './src/components/guitar/screens/FingerPracticeScreen'
+import { ScalePracticeScreen } from './src/components/guitar/screens/ScalePracticeScreen'
 import { CategoryScreen } from './src/screens/CategoryScreen'
 import { LessonScreen } from './src/screens/LessonScreen'
 import { RhythmEchoGame } from './src/screens/RhythmEchoGame'
@@ -40,10 +46,18 @@ type Screen =
   | 'theory'
   | 'theoryLesson'
   | 'theoryQuiz'
+  | 'guitarChords'
+  | 'guitarGenerator'
+  | 'guitarChanges'
+  | 'guitarStrum'
+  | 'guitarFingers'
+  | 'guitarScales'
 
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home')
+  // Comutatorul de stângaci, comun bibliotecii și generatorului. În aplicație vine din setări.
+  const [guitarMirrored, setGuitarMirrored] = useState(false)
   const [category, setCategory] = useState<Category | null>(null)
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [theoryLesson, setTheoryLesson] = useState<DrumTheoryLesson | null>(null)
@@ -92,6 +106,32 @@ export default function App() {
           onOpenGrooves={() => setScreen('grooves')}
           onOpenFills={() => setScreen('fills')}
           onOpenAdvancedFills={() => setScreen('advancedFills')}
+          onOpenGuitarChords={() => setScreen('guitarChords')}
+          onOpenGuitarGenerator={() => setScreen('guitarGenerator')}
+          onOpenGuitarChanges={() => setScreen('guitarChanges')}
+          onOpenGuitarStrum={() => setScreen('guitarStrum')}
+          onOpenGuitarFingers={() => setScreen('guitarFingers')}
+          onOpenGuitarScales={() => setScreen('guitarScales')}
+        />
+      ) : screen === 'guitarChords' ? (
+        <ChordLibraryScreen
+          mirrored={guitarMirrored}
+          onMirroredChange={setGuitarMirrored}
+          onExit={() => setScreen('home')}
+        />
+      ) : screen === 'guitarFingers' ? (
+        <FingerPracticeScreen mirrored={guitarMirrored} onExit={() => setScreen('home')} />
+      ) : screen === 'guitarScales' ? (
+        <ScalePracticeScreen mirrored={guitarMirrored} onExit={() => setScreen('home')} />
+      ) : screen === 'guitarStrum' ? (
+        <StrumPracticeScreen mirrored={guitarMirrored} onExit={() => setScreen('home')} />
+      ) : screen === 'guitarChanges' ? (
+        <ChordChangesScreen mirrored={guitarMirrored} onExit={() => setScreen('home')} />
+      ) : screen === 'guitarGenerator' ? (
+        <ChordGeneratorScreen
+          mirrored={guitarMirrored}
+          onMirroredChange={setGuitarMirrored}
+          onExit={() => setScreen('home')}
         />
       ) : screen === 'drums' ? (
         <RudimentPracticeScreen onExit={() => setScreen('home')} />

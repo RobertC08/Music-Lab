@@ -1,0 +1,11 @@
+{
+  "id": "fluidr3-nylon",
+  "title": "FluidR3_GM, Acoustic Guitar (nylon)",
+  "license": "MIT",
+  "licenseUrl": "https://opensource.org/licenses/MIT",
+  "credit": "FluidR3_GM soundfont, Copyright 2000-2002, 2008 Frank Wen; 2008 Toby Smithe. Note renders via gleitz/midi-js-soundfonts.",
+  "source": "https://github.com/gleitz/midi-js-soundfonts",
+  "sampleRate": 44100,
+  "channels": 1,
+  "bitDepth": 16
+}
